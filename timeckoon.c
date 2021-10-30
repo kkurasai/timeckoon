@@ -4,39 +4,48 @@
 
 #define MAX 100
 
+typedef int Iterador;
+typedef int Horario;
+
+typedef struct Periodo {
+    Horario comeco;
+    Horario fim;
+} Periodo;
+
+enum DiaSemana {dom, seg, ter, qua, qui, sex, sab};
+typedef enum DiaSemana DiaSemana;
+
 int main() {
 
     FILE * fp;
 
     //variaveis do menu de dia unico
-    int comecoDia, fimDia, cont1, ocupado1[2][MAX], disp1[2][MAX], duracao[MAX];
+    Horario comecoDia, fimDia;
+    Periodo ocupado1[MAX], disp1[MAX];
+    int cont1, duracao[MAX];    
 
     //variaveis comuns
-    int h, min, i, j, k, l, aux, menor, posicaoMenor, numRepetidos;
+    Horario menor;
+    Iterador i, j, k, l;
+    int h, min, aux, posicaoMenor, numRepetidos;    
 
     //variaveis do menu de semana
-    int diaInt, qtdeDias, diaCalc, cont2[7], diasEspecif[7], comecoDiaVet[7], fimDiaVet[7], ocupado2[7][2][MAX], disp2[7][2][MAX];
-    char opcao, dia[20], diaAnterior[20];
+    Horario comecoDiaVet[7], fimDiaVet[7];
+    Periodo ocupado2[7][MAX], disp2[7][MAX];
+    DiaSemana diaInserir, dias[7];
+    int qtdDias, cont2[7];
+    char opcao, diaString[20], diaAnterior[20];
 
     while(1) {
         //inicializando variaveis
         for(i=0; i<MAX; i++)
-            duracao[i]=0;
+            ocupado1[i].comeco = ocupado1[i].fim = disp1[i].comeco = disp1[i].fim = duracao[i]=0;
         for(i=0; i<7; i++) {
-            cont2[i]=0;
-            comecoDiaVet[i]=0;
-            fimDiaVet[i]=0;
-            for(j=0; j<2; j++)
-                for(k=0; k<MAX; k++)
-                    ocupado2[i][j][k]=0;
-        }     
-        for(i=0; i<2; i++)
+            cont2[i] = comecoDiaVet[i] = fimDiaVet[i] = 0;
             for(j=0; j<MAX; j++)
-                ocupado1[i][j]=disp1[i][j]=0;
-        cont1=h=min=i=j=aux=menor=posicaoMenor=0;
-        fimDia=0;
-        comecoDia=0;
-        diaInt=10;
+                ocupado2[i][j].comeco = ocupado2[i][j].fim = disp2[i][j].comeco = disp2[i][j].fim = 0;
+        }        
+        cont1 = fimDia = comecoDia = 0;
               
         //menu geral
         system("cls");
@@ -99,7 +108,7 @@ int main() {
                         else
                             printf("Horario invalido! Por favor, insira novamente.\n");
                     }                        
-                    comecoDia=h*60+min;
+                    comecoDia = h*60 + min;
 
                     //validador de entrada do fim
                     while(1) {
@@ -110,7 +119,7 @@ int main() {
                         else
                             printf("Horario invalido! Por favor, insira novamente.\n");
                     }
-                    fimDia=h*60+min;
+                    fimDia = h*60 + min;
                 }                
                 
                 //inserir um periodo de tempo ocupado
@@ -125,7 +134,7 @@ int main() {
                             else
                                 printf("Horario invalido! Por favor, insira novamente.\n");
                         }
-                        ocupado1[0][cont1]=h*60+min;
+                        ocupado1[cont1].comeco = h*60 + min;
 
                         //validador do fim do periodo
                         while(1) {
@@ -136,10 +145,10 @@ int main() {
                             else
                                 printf("Horario invalido! Por favor, insira novamente.\n");
                         }
-                        ocupado1[1][cont1]=h*60+min; //conversao para minutos
+                        ocupado1[cont1].fim = h*60 + min; //conversao para minutos
 
                         //validador do periodo
-                        if(ocupado1[0][cont1]>=ocupado1[1][cont1])
+                        if(ocupado1[cont1].comeco >= ocupado1[cont1].fim)
                             printf("Periodo invalido! Por favor, insira novamente.\n");
                         else {
                             cont1++;
@@ -157,74 +166,74 @@ int main() {
                        blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
 
                     if(comecoDia>fimDia) {
-                        ocupado1[0][cont1]=fimDia;
-                        ocupado1[1][cont1]=comecoDia;
+                        ocupado1[cont1].comeco = fimDia;
+                        ocupado1[cont1].fim = comecoDia;
                     }
                     else if(comecoDia<fimDia) {
-                        ocupado1[0][cont1]=fimDia;
-                        ocupado1[1][cont1]=24*60;
+                        ocupado1[cont1].comeco = fimDia;
+                        ocupado1[cont1].fim = 24*60;
                         cont1++;
-                        ocupado1[0][cont1]=0;
-                        ocupado1[1][cont1]=comecoDia;
+                        ocupado1[cont1].comeco = 0;
+                        ocupado1[cont1].fim = comecoDia;
                     }
 
                     //select sort entre as entradas
-                    for(i=0; i<=cont1-1; i++) {
-                        menor=100000;
-                        for(j=i; j<=cont1; j++) {
-                            if(ocupado1[0][j]<menor) {
-                                menor=ocupado1[0][j];
-                                posicaoMenor=j;
+                    for(i=0; i <= cont1-1; i++) {
+                        menor = 100000;
+                        for(j=i; j <= cont1; j++) {
+                            if(ocupado1[j].comeco < menor) {
+                                menor = ocupado1[j].comeco;
+                                posicaoMenor = j;
                             }
                         }            
-                        aux=ocupado1[0][i];
-                        ocupado1[0][i]=ocupado1[0][posicaoMenor];
-                        ocupado1[0][posicaoMenor]=aux;
+                        aux = ocupado1[i].comeco;
+                        ocupado1[i].comeco = ocupado1[posicaoMenor].comeco;
+                        ocupado1[posicaoMenor].comeco = aux;
 
-                        aux=ocupado1[1][i];
-                        ocupado1[1][i]=ocupado1[1][posicaoMenor];
-                        ocupado1[1][posicaoMenor]=aux;
+                        aux = ocupado1[i].fim;
+                        ocupado1[i].fim = ocupado1[posicaoMenor].fim;
+                        ocupado1[posicaoMenor].fim = aux;
                     }
 
-                    // select sort se o ocupado1[0] for igual mas ocupado[1] diferente
-                    for(i=0; i<=cont1; i+=numRepetidos+1) {
+                    // select sort se o ocupado1.comeco for igual mas ocupado.fim diferente
+                    for(i=0; i <= cont1; i += numRepetidos+1) {
                         numRepetidos=0;
-                        for(j=i+1; j<=cont1; j++)
-                            if(ocupado1[0][j]==ocupado1[0][i])
+                        for(j = i+1; j <= cont1; j++)
+                            if(ocupado1[j].comeco == ocupado1[i].comeco)
                                 numRepetidos++;
 
-                        for(j=i; j<=i+numRepetidos-1; j++) {
-                            menor=100000;
-                            for(k=i; k<=i+numRepetidos; k++) {
-                                if(ocupado1[1][k]<menor) {
-                                    menor=ocupado1[1][k];
-                                    posicaoMenor=k;
+                        for(j=i; j <= i+numRepetidos-1; j++) {
+                            menor = 100000;
+                            for(k=i; k <= i+numRepetidos; k++) {
+                                if(ocupado1[k].fim < menor) {
+                                    menor = ocupado1[k].fim;
+                                    posicaoMenor = k;
                                 }
                             }            
-                            aux=ocupado1[1][j];
-                            ocupado1[1][j]=ocupado1[1][posicaoMenor];
-                            ocupado1[1][posicaoMenor]=aux;
+                            aux = ocupado1[j].fim;
+                            ocupado1[j].fim = ocupado1[posicaoMenor].fim;
+                            ocupado1[posicaoMenor].fim = aux;
                         }
                     }
                     
                     //remover periodos de tempo redundantes
-                    for(i=1; i<=cont1; i++) {
+                    for(i=1; i <= cont1; i++) {
                         //se um periodo estiver contido em outro, vamos exclui-lo
-                        if(ocupado1[0][i]>ocupado1[0][i-1] && ocupado1[1][i]<ocupado1[1][i-1]) {
-                            for(j=i; j<=cont1-1; j++) {
-                                ocupado1[0][j]=ocupado1[0][j+1];
-                                ocupado1[1][j]=ocupado1[1][j+1];
+                        if(ocupado1[i].comeco > ocupado1[i-1].comeco && ocupado1[i].fim < ocupado1[i-1].fim) {
+                            for(j=i; j <= cont1-1; j++) {
+                                ocupado1[j].comeco = ocupado1[j+1].comeco;
+                                ocupado1[j].fim = ocupado1[j+1].fim;
                             }
                             cont1--; //um periodo a menos no vetor
                             i--;
                         }
 
                         //se um periodo comecar antes ou quando outro acabar, vamos junta-los
-                        else if(ocupado1[0][i]<=ocupado1[1][i-1]) {
-                            ocupado1[1][i-1]=ocupado1[1][i];
-                            for(j=i; j<=cont1-1; j++) {
-                                ocupado1[0][j]=ocupado1[0][j+1];
-                                ocupado1[1][j]=ocupado1[1][j+1];
+                        else if(ocupado1[i].comeco <= ocupado1[i-1].fim) {
+                            ocupado1[i-1].fim = ocupado1[i].fim;
+                            for(j=i; j <= cont1-1; j++) {
+                                ocupado1[j].comeco = ocupado1[j+1].comeco;
+                                ocupado1[j].fim = ocupado1[j+1].fim;
                             }
                             cont1--; //um periodo a menos no vetor
                             i--;
@@ -233,7 +242,7 @@ int main() {
 
 
                     //calculo dos tempos disponiveis
-                    for(i=0; i<=cont1+1; i++) {
+                    for(i=0; i <= cont1+1; i++) {
                         /* No geral, os periodos disponiveis sao o intervalo entre o final de
                            um periodo ocupado e comeco do seguinte.
                            Para que o algoritmo seja generico, o primeiro periodo sera sempre
@@ -242,26 +251,26 @@ int main() {
                            A mesma logica se aplica ao ultimo periodo disp. */
 
                         if(i==0) {
-                            disp1[0][i]=0;
-                            disp1[1][i]=ocupado1[0][i];
+                            disp1[i].comeco = 0;
+                            disp1[i].fim = ocupado1[i].comeco;
                         }
-                        else if(i==cont1+1) {
-                            disp1[0][i]=ocupado1[1][i-1];
-                            disp1[1][i]=24*60;
+                        else if(i == cont1+1) {
+                            disp1[i].comeco = ocupado1[i-1].fim;
+                            disp1[i].fim = 24*60;
                         }
                         else {
-                            disp1[0][i]=ocupado1[1][i-1];
-                            disp1[1][i]=ocupado1[0][i];
+                            disp1[i].comeco = ocupado1[i-1].fim;
+                            disp1[i].fim = ocupado1[i].comeco;
                         }
                     }
 
                     printf("\nPeriodos de tempo disponiveis:\n");
-                    for(i=0; i<=cont1+1; i++) {
-                        duracao[i]=disp1[1][i]-disp1[0][i];
+                    for(i=0; i <= cont1+1; i++) {
+                        duracao[i] = disp1[i].fim - disp1[i].comeco;
 
-                        if(duracao[i]!=0) { //para excluir periodos nulos
-                            printf("> %02d:%02.0f - %02d:%02.0f\n", disp1[0][i]/60, (disp1[0][i]/60.0-disp1[0][i]/60)*60, disp1[1][i]/60, (disp1[1][i]/60.0-disp1[1][i]/60)*60);
-                            printf("  Duracao: %02d:%02.0f\n\n", duracao[i]/60, (duracao[i]/60.0-duracao[i]/60)*60);
+                        if(duracao[i] != 0) { //para excluir periodos nulos
+                            printf("> %02d:%02.0f - %02d:%02.0f\n", disp1[i].comeco/60, (disp1[i].comeco/60.0 - disp1[i].comeco/60)*60, disp1[i].fim/60, (disp1[i].fim/60.0 - disp1[i].fim/60)*60);
+                            printf("  Duracao: %02d:%02.0f\n\n", duracao[i]/60, (duracao[i]/60.0 - duracao[i]/60)*60);
                         }
                         else if(i==1)
                             printf("Nenhum\n");
@@ -281,74 +290,74 @@ int main() {
                        blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
 
                     if(comecoDia>fimDia) {
-                        ocupado1[0][cont1]=fimDia;
-                        ocupado1[1][cont1]=comecoDia;
+                        ocupado1[cont1].comeco = fimDia;
+                        ocupado1[cont1].fim = comecoDia;
                     }
                     else if(comecoDia<fimDia) {
-                        ocupado1[0][cont1]=fimDia;
-                        ocupado1[1][cont1]=24*60;
+                        ocupado1[cont1].comeco = fimDia;
+                        ocupado1[cont1].fim = 24*60;
                         cont1++;
-                        ocupado1[0][cont1]=0;
-                        ocupado1[1][cont1]=comecoDia;
+                        ocupado1[cont1].comeco = 0;
+                        ocupado1[cont1].fim = comecoDia;
                     }
 
                     //select sort entre as entradas
-                    for(i=0; i<=cont1-1; i++) {
-                        menor=100000;
-                        for(j=i; j<=cont1; j++) {
-                            if(ocupado1[0][j]<menor) {
-                                menor=ocupado1[0][j];
-                                posicaoMenor=j;
+                    for(i=0; i <= cont1-1; i++) {
+                        menor = 100000;
+                        for(j=i; j <= cont1; j++) {
+                            if(ocupado1[j].comeco < menor) {
+                                menor = ocupado1[j].comeco;
+                                posicaoMenor = j;
                             }
                         }            
-                        aux=ocupado1[0][i];
-                        ocupado1[0][i]=ocupado1[0][posicaoMenor];
-                        ocupado1[0][posicaoMenor]=aux;
+                        aux = ocupado1[i].comeco;
+                        ocupado1[i].comeco = ocupado1[posicaoMenor].comeco;
+                        ocupado1[posicaoMenor].comeco = aux;
 
-                        aux=ocupado1[1][i];
-                        ocupado1[1][i]=ocupado1[1][posicaoMenor];
-                        ocupado1[1][posicaoMenor]=aux;
+                        aux = ocupado1[i].fim;
+                        ocupado1[i].fim = ocupado1[posicaoMenor].fim;
+                        ocupado1[posicaoMenor].fim = aux;
                     }
 
-                    // select sort se o ocupado1[0] for igual mas ocupado[1] diferente
-                    for(i=0; i<=cont1; i+=numRepetidos+1) {
-                        numRepetidos=0;
-                        for(j=i+1; j<=cont1; j++)
-                            if(ocupado1[0][j]==ocupado1[0][i])
+                    // select sort se o ocupado1.comeco for igual mas ocupado.fim diferente
+                    for(i=0; i <= cont1; i += numRepetidos+1) {
+                        numRepetidos = 0;
+                        for(j = i+1; j <= cont1; j++)
+                            if(ocupado1[j].comeco == ocupado1[i].comeco)
                                 numRepetidos++;
 
-                        for(j=i; j<=i+numRepetidos-1; j++) {
-                            menor=100000;
-                            for(k=i; k<=i+numRepetidos; k++) {
-                                if(ocupado1[1][k]<menor) {
-                                    menor=ocupado1[1][k];
-                                    posicaoMenor=k;
+                        for(j=i; j <= i+numRepetidos-1; j++) {
+                            menor = 100000;
+                            for(k=i; k <= i+numRepetidos; k++) {
+                                if(ocupado1[k].comeco < menor) {
+                                    menor = ocupado1[k].comeco;
+                                    posicaoMenor = k;
                                 }
                             }            
-                            aux=ocupado1[1][j];
-                            ocupado1[1][j]=ocupado1[1][posicaoMenor];
-                            ocupado1[1][posicaoMenor]=aux;
+                            aux = ocupado1[j].comeco;
+                            ocupado1[j].comeco = ocupado1[posicaoMenor].comeco;
+                            ocupado1[posicaoMenor].comeco = aux;
                         }
                     }
                     
                     //remover periodos de tempo redundantes
-                    for(i=1; i<=cont1; i++) {
+                    for(i=1; i <= cont1; i++) {
                         //se um periodo estiver contido em outro, vamos exclui-lo
-                        if(ocupado1[0][i]>ocupado1[0][i-1] && ocupado1[1][i]<ocupado1[1][i-1]) {
-                            for(j=i; j<=cont1-1; j++) {
-                                ocupado1[0][j]=ocupado1[0][j+1];
-                                ocupado1[1][j]=ocupado1[1][j+1];
+                        if(ocupado1[i].comeco > ocupado1[i-1].comeco && ocupado1[i].fim < ocupado1[i-1].fim) {
+                            for(j=i; j <= cont1-1; j++) {
+                                ocupado1[j].comeco = ocupado1[j+1].comeco;
+                                ocupado1[j].fim = ocupado1[j+1].fim;
                             }
                             cont1--; //um periodo a menos no vetor
                             i--;
                         }
 
                         //se um periodo comecar antes ou quando outro acabar, vamos junta-los
-                        else if(ocupado1[0][i]<=ocupado1[1][i-1]) {
-                            ocupado1[1][i-1]=ocupado1[1][i];
-                            for(j=i; j<=cont1-1; j++) {
-                                ocupado1[0][j]=ocupado1[0][j+1];
-                                ocupado1[1][j]=ocupado1[1][j+1];
+                        else if(ocupado1[i].comeco <= ocupado1[i-1].fim) {
+                            ocupado1[i-1].fim = ocupado1[i].fim;
+                            for(j=i; j <= cont1-1; j++) {
+                                ocupado1[j].comeco = ocupado1[j+1].comeco;
+                                ocupado1[j].fim = ocupado1[j+1].fim;
                             }
                             cont1--; //um periodo a menos no vetor
                             i--;
@@ -357,7 +366,7 @@ int main() {
 
 
                     //calculo dos tempos disponiveis
-                    for(i=0; i<=cont1+1; i++) {
+                    for(i=0; i <= cont1+1; i++) {
                         /* No geral, os periodos disponiveis sao o intervalo entre o final de
                            um periodo ocupado e comeco do seguinte.
                            Para que o algoritmo seja generico, o primeiro periodo sera sempre
@@ -366,28 +375,28 @@ int main() {
                            A mesma logica se aplica ao ultimo periodo disponivel. */
 
                         if(i==0) {
-                            disp1[0][i]=0;
-                            disp1[1][i]=ocupado1[0][i];
+                            disp1[i].comeco = 0;
+                            disp1[i].fim = ocupado1[i].comeco;
                         }
-                        else if(i==cont1+1) {
-                            disp1[0][i]=ocupado1[1][i-1];
-                            disp1[1][i]=24*60;
+                        else if(i == cont1+1) {
+                            disp1[i].comeco = ocupado1[i-1].fim;
+                            disp1[i].fim = 24*60;
                         }
                         else {
-                            disp1[0][i]=ocupado1[1][i-1];
-                            disp1[1][i]=ocupado1[0][i];
+                            disp1[i].comeco = ocupado1[i-1].fim;
+                            disp1[i].fim = ocupado1[i].comeco;
                         }
                     }
 
                     fp=fopen("horarios.txt", "w");
 
                     fprintf(fp, "Periodos de tempo disponiveis:\n");
-                    for(i=0; i<=cont1+1; i++) {
-                        duracao[i]=disp1[1][i]-disp1[0][i];
+                    for(i=0; i <= cont1+1; i++) {
+                        duracao[i] = disp1[i].fim - disp1[i].comeco;
 
-                        if(duracao[i]!=0) { //para excluir periodos nulos
-                            fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp1[0][i]/60, (disp1[0][i]/60.0-disp1[0][i]/60)*60, disp1[1][i]/60, (disp1[1][i]/60.0-disp1[1][i]/60)*60);
-                            fprintf(fp, "  Duracao: %02d:%02.0f\n\n", duracao[i]/60, (duracao[i]/60.0-duracao[i]/60)*60);
+                        if(duracao[i] != 0) { //para excluir periodos nulos
+                            fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp1[i].comeco/60, (disp1[i].comeco/60.0 - disp1[i].comeco/60)*60, disp1[i].fim/60, (disp1[i].fim/60.0 - disp1[i].fim/60)*60);
+                            fprintf(fp, "  Duracao: %02d:%02.0f\n\n", duracao[i]/60, (duracao[i]/60.0 - duracao[i]/60)*60);
                         }
                         else if(i==1)
                             fprintf(fp, "Nenhum\n");
@@ -451,48 +460,47 @@ int main() {
                     if(opcao=='2') {
                         //quantidade de dias
                         printf("\nQuantidade de dias: ");
-                        scanf("%d", &qtdeDias);
-
-                        getchar();
+                        scanf("%d", &qtdDias);
 
                         //lendo os dias
-                        for(i=0; i<qtdeDias; ) {
+                        for(i=0; i<qtdDias; ) {
                             printf("\nDia %d: ", i+1);
-                            gets(dia);
-                            if(stricmp(dia, diaAnterior)==0)
+                            fflush(stdin);
+                            gets(diaString);
+                            if(stricmp(diaString, diaAnterior)==0)
                                 printf("Dia da semana repetido! Por favor, insira novamente.\n");
-                            else if(stricmp(dia, "Domingo")==0 || stricmp(dia, "domingo")==0 || stricmp(dia, "DOMINGO")==0) {
-                                diasEspecif[i]=0;
+                            else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
+                                dias[i]=dom;
                                 i++;
                             }
-                            else if(stricmp(dia, "Segunda")==0 || stricmp(dia, "segunda")==0 || stricmp(dia, "SEGUNDA")==0 || stricmp(dia, "Segunda-feira")==0 || stricmp(dia, "segunda-feira")==0 || stricmp(dia, "SEGUNDA-FEIRA")==0) {
-                                diasEspecif[i]=1;
+                            else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
+                                dias[i]=seg;
                                 i++;
                             }
-                            else if(stricmp(dia, "Terca")==0 || stricmp(dia, "terca")==0 || stricmp(dia, "TERCA")==0 || stricmp(dia, "Terca-feira")==0 || stricmp(dia, "terca-feira")==0 || stricmp(dia, "TERCA-FEIRA")==0) {
-                                diasEspecif[i]=2;
+                            else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
+                                dias[i]=ter;
                                 i++;
                             }
-                            else if(stricmp(dia, "Quarta")==0 || stricmp(dia, "quarta")==0 || stricmp(dia, "QUARTA")==0 || stricmp(dia, "Quarta-feira")==0 || stricmp(dia, "quarta-feira")==0 || stricmp(dia, "QUARTA-FEIRA")==0) {
-                                diasEspecif[i]=3;
+                            else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
+                                dias[i]=qua;
                                 i++;
                             }
-                            else if(stricmp(dia, "Quinta")==0 || stricmp(dia, "quinta")==0 || stricmp(dia, "QUINTA")==0 || stricmp(dia, "Quinta-feira")==0 || stricmp(dia, "quinta-feira")==0 || stricmp(dia, "QUINTA-FEIRA")==0) {
-                                diasEspecif[i]=4;
+                            else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
+                                dias[i]=qui;
                                 i++;
                             }
-                            else if(stricmp(dia, "Sexta")==0 || stricmp(dia, "sexta")==0 || stricmp(dia, "SEXTA")==0 || stricmp(dia, "Sexta-feira")==0 || stricmp(dia, "sexta-feira")==0 || stricmp(dia, "SEXTA-FEIRA")==0) {
-                                diasEspecif[i]=5;
+                            else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
+                                dias[i]=sex;
                                 i++;
                             }
-                            else if(stricmp(dia, "Sabado")==0 || stricmp(dia, "sabado")==0 || stricmp(dia, "SABADO")==0) {
-                                diasEspecif[i]=6;
+                            else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
+                                dias[i]=sab;
                                 i++;
                             }
                             else
                                 printf("Dia da semana invalido! Por favor, insira novamente.\n");
 
-                            strcpy(diaAnterior, dia);
+                            strcpy(diaAnterior, diaString);
                         }
                     }
 
@@ -509,11 +517,11 @@ int main() {
                     //se for para todos os dias
                     if(opcao=='1')
                         for(i=0; i<7; i++)
-                            comecoDiaVet[i]=min+h*60;
+                            comecoDiaVet[i] = min + h*60;
                     //se for para dias especificos
                     else
-                        for(i=0; i<qtdeDias; i++)
-                            comecoDiaVet[diasEspecif[i]]=min+h*60;
+                        for(i=0; i<qtdDias; i++)
+                            comecoDiaVet[dias[i]] = min + h*60;
 
                     //validacao de entrada do horario de fim
                     while(1) {
@@ -528,45 +536,45 @@ int main() {
                     //se for para todos os dias
                     if(opcao=='1')
                         for(i=0; i<7; i++)
-                            fimDiaVet[i]=min+h*60;
+                            fimDiaVet[i] = min + h*60;
                     //se for para dias especificos
                     else
-                        for(i=0; i<qtdeDias; i++)
-                            fimDiaVet[diasEspecif[i]]=min+h*60;
+                        for(i=0; i<qtdDias; i++)
+                            fimDiaVet[dias[i]] = min + h*60;
                 }
 
                 //definir dia da semana
                 else if(opcao=='2') {
-                    getchar();
                     while(1) {
                         printf("\nDigite o dia da semana: ");
-                        gets(dia);
-                        if(stricmp(dia, "Domingo")==0 || stricmp(dia, "domingo")==0 || stricmp(dia, "DOMINGO")==0) {
-                            diaInt=0;
+                        fflush(stdin);
+                        gets(diaString);
+                        if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
+                            diaInserir=dom;
                             break;
                         }
-                        else if(stricmp(dia, "Segunda")==0 || stricmp(dia, "segunda")==0 || stricmp(dia, "SEGUNDA")==0 || stricmp(dia, "Segunda-feira")==0 || stricmp(dia, "segunda-feira")==0 || stricmp(dia, "SEGUNDA-FEIRA")==0) {
-                            diaInt=1;
+                        else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
+                            diaInserir=seg;
                             break;
                         }
-                        else if(stricmp(dia, "Terca")==0 || stricmp(dia, "terca")==0 || stricmp(dia, "TERCA")==0 || stricmp(dia, "Terca-feira")==0 || stricmp(dia, "terca-feira")==0 || stricmp(dia, "TERCA-FEIRA")==0) {
-                            diaInt=2;
+                        else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
+                            diaInserir=ter;
                             break;
                         }
-                        else if(stricmp(dia, "Quarta")==0 || stricmp(dia, "quarta")==0 || stricmp(dia, "QUARTA")==0 || stricmp(dia, "Quarta-feira")==0 || stricmp(dia, "quarta-feira")==0 || stricmp(dia, "QUARTA-FEIRA")==0) {
-                            diaInt=3;
+                        else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
+                            diaInserir=qua;
                             break;
                         }
-                        else if(stricmp(dia, "Quinta")==0 || stricmp(dia, "quinta")==0 || stricmp(dia, "QUINTA")==0 || stricmp(dia, "Quinta-feira")==0 || stricmp(dia, "quinta-feira")==0 || stricmp(dia, "QUINTA-FEIRA")==0) {
-                            diaInt=4;
+                        else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
+                            diaInserir=qui;
                             break;
                         }
-                        else if(stricmp(dia, "Sexta")==0 || stricmp(dia, "sexta")==0 || stricmp(dia, "SEXTA")==0 || stricmp(dia, "Sexta-feira")==0 || stricmp(dia, "sexta-feira")==0 || stricmp(dia, "SEXTA-FEIRA")==0) {
-                            diaInt=5;
+                        else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
+                            diaInserir=sex;
                             break;
                         }
-                        else if(stricmp(dia, "Sabado")==0 || stricmp(dia, "sabado")==0 || stricmp(dia, "SABADO")==0) {
-                            diaInt=6;
+                        else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
+                            diaInserir=sab;
                             break;
                         }
                         else
@@ -578,7 +586,7 @@ int main() {
                 else if(opcao=='3') {
                     while(1) {
                         //caso um dia nao tiver sido escolhido previamente
-                        if(diaInt==10) {
+                        if(diaInserir==10) {
                             printf("Voce precisa escolher o um dia primeiro!\n");
                             system("pause");
                             break;
@@ -594,7 +602,7 @@ int main() {
                                 printf("Horario invalido! Por favor, insira novamente.\n");
                         }
 
-                        ocupado2[diaInt][0][cont2[diaInt]]=h*60+min;
+                        ocupado2[diaInserir][cont2[diaInserir]].comeco = h*60 + min;
 
                         //validador de entrada do fim
                         while(1) {
@@ -607,11 +615,11 @@ int main() {
                         }
 
                         //validador de periodo
-                        if(ocupado2[diaInt][0][cont2[diaInt]]>=h*60+min)
+                        if(ocupado2[diaInserir][cont2[diaInserir]].comeco >= h*60 + min)
                             printf("Periodo invalido! Por favor, insira novamente.\n");
                         else {
-                            ocupado2[diaInt][1][cont2[diaInt]]=h*60+min;
-                            cont2[diaInt]++;
+                            ocupado2[diaInserir][cont2[diaInserir]].fim = h*60 + min;
+                            cont2[diaInserir]++;
                             break;
                         }
                     }
@@ -637,134 +645,133 @@ int main() {
                     if(opcao=='1') {
                         //quantidade de dias
                         printf("\nQuantidade de dias: ");
-                        scanf("%d", &qtdeDias);
-
-                        getchar();
+                        scanf("%d", &qtdDias);
 
                         //lendo os dias
-                        for(i=0; i<qtdeDias; ) {
+                        for(i=0; i<qtdDias; ) {
                             printf("\nDia %d: ", i+1);
-                            gets(dia);
-                            if(stricmp(dia, diaAnterior)==0)
+                            fflush(stdin);
+                            gets(diaString);
+                            if(stricmp(diaString, diaAnterior)==0)
                                 printf("Dia da semana repetido! Por favor, insira novamente.\n");
-                            else if(stricmp(dia, "Domingo")==0 || stricmp(dia, "domingo")==0 || stricmp(dia, "DOMINGO")==0) {
-                                diasEspecif[i]=0;
+                            else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
+                                dias[i]=dom;
                                 i++;
                             }
-                            else if(stricmp(dia, "Segunda")==0 || stricmp(dia, "segunda")==0 || stricmp(dia, "SEGUNDA")==0 || stricmp(dia, "Segunda-feira")==0 || stricmp(dia, "segunda-feira")==0 || stricmp(dia, "SEGUNDA-FEIRA")==0) {
-                                diasEspecif[i]=1;
+                            else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
+                                dias[i]=seg;
                                 i++;
                             }
-                            else if(stricmp(dia, "Terca")==0 || stricmp(dia, "terca")==0 || stricmp(dia, "TERCA")==0 || stricmp(dia, "Terca-feira")==0 || stricmp(dia, "terca-feira")==0 || stricmp(dia, "TERCA-FEIRA")==0) {
-                                diasEspecif[i]=2;
+                            else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
+                                dias[i]=ter;
                                 i++;
                             }
-                            else if(stricmp(dia, "Quarta")==0 || stricmp(dia, "quarta")==0 || stricmp(dia, "QUARTA")==0 || stricmp(dia, "Quarta-feira")==0 || stricmp(dia, "quarta-feira")==0 || stricmp(dia, "QUARTA-FEIRA")==0) {
-                                diasEspecif[i]=3;
+                            else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
+                                dias[i]=qua;
                                 i++;
                             }
-                            else if(stricmp(dia, "Quinta")==0 || stricmp(dia, "quinta")==0 || stricmp(dia, "QUINTA")==0 || stricmp(dia, "Quinta-feira")==0 || stricmp(dia, "quinta-feira")==0 || stricmp(dia, "QUINTA-FEIRA")==0) {
-                                diasEspecif[i]=4;
+                            else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
+                                dias[i]=qui;
                                 i++;
                             }
-                            else if(stricmp(dia, "Sexta")==0 || stricmp(dia, "sexta")==0 || stricmp(dia, "SEXTA")==0 || stricmp(dia, "Sexta-feira")==0 || stricmp(dia, "sexta-feira")==0 || stricmp(dia, "SEXTA-FEIRA")==0) {
-                                diasEspecif[i]=5;
+                            else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
+                                dias[i]=sex;
                                 i++;
                             }
-                            else if(stricmp(dia, "Sabado")==0 || stricmp(dia, "sabado")==0 || stricmp(dia, "SABADO")==0) {
-                                diasEspecif[i]=6;
+                            else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
+                                dias[i]=sab;
                                 i++;
                             }
                             else
                                 printf("Dia da semana invalido! Por favor, insira novamente.\n");
 
-                            strcpy(diaAnterior, dia);
+                            strcpy(diaAnterior, diaString);
                         }
 
-                        for(i=0; i<qtdeDias; i++) {
+                        for(i=0; i<qtdDias; i++) {
                             /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
                             Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
                             seu tempo de sono pode ser considerado um bloco de tempo ocupado.
                             Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
                             blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
                             
-                            if(comecoDiaVet[diasEspecif[i]]>fimDiaVet[diasEspecif[i]]) {
-                                ocupado2[diasEspecif[i]][0][cont2[diasEspecif[i]]]=fimDiaVet[diasEspecif[i]];
-                                ocupado2[diasEspecif[i]][1][cont2[diasEspecif[i]]]=comecoDiaVet[diasEspecif[i]];
+                            if(comecoDiaVet[dias[i]] > fimDiaVet[dias[i]]) {
+                                ocupado2[dias[i]][cont2[dias[i]]].comeco = fimDiaVet[dias[i]];
+                                ocupado2[dias[i]][cont2[dias[i]]].fim = comecoDiaVet[dias[i]];
                             }
-                            else if(comecoDiaVet[diasEspecif[i]]<fimDiaVet[diasEspecif[i]]) {
-                                ocupado2[diasEspecif[i]][0][cont2[diasEspecif[i]]]=fimDiaVet[diasEspecif[i]];
-                                ocupado2[diasEspecif[i]][1][cont2[diasEspecif[i]]]=24*60;
-                                cont2[diasEspecif[i]]++;
-                                ocupado2[diasEspecif[i]][0][cont2[diasEspecif[i]]]=0;
-                                ocupado2[diasEspecif[i]][1][cont2[diasEspecif[i]]]=comecoDiaVet[diasEspecif[i]];
+                            else if(comecoDiaVet[dias[i]] < fimDiaVet[dias[i]]) {
+                                ocupado2[dias[i]][cont2[dias[i]]].comeco = fimDiaVet[dias[i]];
+                                ocupado2[dias[i]][cont2[dias[i]]].fim = 24*60;
+                                cont2[dias[i]]++;
+                                ocupado2[dias[i]][cont2[dias[i]]].comeco = 0;
+                                ocupado2[dias[i]][cont2[dias[i]]].fim = comecoDiaVet[dias[i]];
                             }
 
                             //select sort entre as entradas
-                            for(j=0; j<=cont2[diasEspecif[i]]-1; j++) {
-                                menor=100000;
-                                for(k=j; k<=cont2[diasEspecif[i]]; k++) {
-                                    if(ocupado2[diasEspecif[i]][0][k]<menor) {
-                                        menor=ocupado2[diasEspecif[i]][0][k];
-                                        posicaoMenor=k;
+                            for(j=0; j <= cont2[dias[i]]-1; j++) {
+                                menor = 100000;
+                                for(k=j; k <= cont2[dias[i]]; k++) {
+                                    if(ocupado2[dias[i]][k].comeco < menor) {
+                                        menor = ocupado2[dias[i]][k].comeco;
+                                        posicaoMenor = k;
                                     }
                                 }            
-                                aux=ocupado2[diasEspecif[i]][0][j];
-                                ocupado2[diasEspecif[i]][0][j]=ocupado2[diasEspecif[i]][0][posicaoMenor];
-                                ocupado2[diasEspecif[i]][0][posicaoMenor]=aux;
+                                aux = ocupado2[dias[i]][j].comeco;
+                                ocupado2[dias[i]][j].comeco = ocupado2[dias[i]][posicaoMenor].comeco;
+                                ocupado2[dias[i]][posicaoMenor].comeco = aux;
 
-                                aux=ocupado2[diasEspecif[i]][1][j];
-                                ocupado2[diasEspecif[i]][1][j]=ocupado2[diasEspecif[i]][1][posicaoMenor];
-                                ocupado2[diasEspecif[i]][1][posicaoMenor]=aux;
+                                aux = ocupado2[dias[i]][j].fim;
+                                ocupado2[dias[i]][j].fim = ocupado2[dias[i]][posicaoMenor].fim;
+                                ocupado2[dias[i]][posicaoMenor].fim = aux;
                             }
 
-                            // select sort se o ocupado2[0] for igual mas ocupado[1] diferente
-                            for(j=0; j<=cont2[diasEspecif[i]]; j+=numRepetidos+1) {
-                                numRepetidos=0;
-                                for(k=j+1; k<=cont2[diasEspecif[i]]; k++)
-                                    if(ocupado2[diasEspecif[i]][0][k]==ocupado2[diasEspecif[i]][0][j])
+                            // select sort se o ocupado2.comeco for igual mas ocupado.fim diferente
+                            for(j=0; j <= cont2[dias[i]]; j += numRepetidos+1) {
+                                numRepetidos = 0;
+                                for(k = j+1; k <= cont2[dias[i]]; k++)
+                                    if(ocupado2[dias[i]][k].comeco == ocupado2[dias[i]][j].comeco)
                                         numRepetidos++;
 
-                                for(k=j; k<=j+numRepetidos-1; k++) {
-                                    menor=100000;
-                                    for(l=j; l<=j+numRepetidos; l++) {
-                                        if(ocupado2[diasEspecif[i]][1][l]<menor) {
-                                            menor=ocupado2[diasEspecif[i]][1][l];
-                                            posicaoMenor=l;
+                                for(k=j; k <= j+numRepetidos-1; k++) {
+                                    menor = 100000;
+                                    for(l=j; l <= j+numRepetidos; l++) {
+                                        if(ocupado2[dias[i]][l].fim < menor) {
+                                            menor = ocupado2[dias[i]][l].fim;
+                                            posicaoMenor = l;
                                         }
                                     }            
-                                    aux=ocupado2[diasEspecif[i]][1][k];
-                                    ocupado2[diasEspecif[i]][1][k]=ocupado2[diasEspecif[i]][1][posicaoMenor];
-                                    ocupado2[diasEspecif[i]][1][posicaoMenor]=aux;
+                                    aux = ocupado2[dias[i]][k].fim;
+                                    ocupado2[dias[i]][k].fim = ocupado2[dias[i]][posicaoMenor].fim;
+                                    ocupado2[dias[i]][posicaoMenor].fim = aux;
                                 }
                             }
                             
                             //remover periodos de tempo redundantes
-                            for(j=1; j<=cont2[diasEspecif[i]]; j++) {
+                            for(j = 1; j <= cont2[dias[i]]; j++) {
                                 //se um periodo estiver contido em outro, vamos exclui-lo
-                                if(ocupado2[diasEspecif[i]][0][j]>ocupado2[diasEspecif[i]][0][j-1] && ocupado2[diasEspecif[i]][1][j]<ocupado2[diasEspecif[i]][1][j-1]) {
-                                    for(k=j; k<=cont2[diasEspecif[i]]-1; k++) {
-                                        ocupado2[diasEspecif[i]][0][k]=ocupado2[diasEspecif[i]][0][k+1];
-                                        ocupado2[diasEspecif[i]][1][k]=ocupado2[diasEspecif[i]][1][k+1];
+                                if(ocupado2[dias[i]][j].comeco > ocupado2[dias[i]][j-1].comeco && ocupado2[dias[i]][j].fim < ocupado2[dias[i]][j-1].fim) {
+                                    for(k=j; k <= cont2[dias[i]] - 1; k++) {
+                                        ocupado2[dias[i]][k].comeco = ocupado2[dias[i]][k+1].comeco;
+                                        ocupado2[dias[i]][k].fim = ocupado2[dias[i]][k+1].fim;
                                     }
-                                    cont2[diasEspecif[i]]--; //um periodo a menos no vetor
+                                    cont2[dias[i]]--; //um periodo a menos no vetor
                                     j--;
                                 }
 
                                 //se um periodo comecar antes ou quando outro acabar, vamos junta-los
-                                else if(ocupado2[diasEspecif[i]][0][j]<=ocupado2[diasEspecif[i]][1][j-1]) {
-                                    ocupado2[diasEspecif[i]][1][j-1]=ocupado2[diasEspecif[i]][1][j];
-                                    for(k=j; k<=cont2[diasEspecif[i]]-1; k++) {
-                                        ocupado2[diasEspecif[i]][0][k]=ocupado2[diasEspecif[i]][0][k+1];
-                                        ocupado2[diasEspecif[i]][1][k]=ocupado2[diasEspecif[i]][1][k+1];
+                                else if(ocupado2[dias[i]][j].comeco <= ocupado2[dias[i]][j-1].fim) {
+                                    ocupado2[dias[i]][j-1].fim = ocupado2[dias[i]][j].fim;
+                                    for(k=j; k <= cont2[dias[i]] - 1; k++) {
+                                        ocupado2[dias[i]][k].comeco = ocupado2[dias[i]][k+1].comeco;
+                                        ocupado2[dias[i]][k].fim = ocupado2[dias[i]][k+1].fim;
                                     }
-                                    cont2[diasEspecif[i]]--; //um periodo a menos no vetor
+                                    cont2[dias[i]]--; //um periodo a menos no vetor
                                     j--;
                                 }
                             }
 
                             //calculo dos tempos disponiveis
-                            for(j=0; j<=cont2[diasEspecif[i]]+1; j++) {
+                            for(j=0; j <= cont2[dias[i]] + 1; j++) {
                                 /* No geral, os periodos disponiveis sao o intervalo entre o final de
                                 um periodo ocupado e comeco do seguinte.
                                 Para que o algoritmo seja generico, o primeiro periodo sera sempre
@@ -773,26 +780,26 @@ int main() {
                                 A mesma logica se aplica ao ultimo periodo disponivel. */
 
                                 if(j==0) {
-                                    disp2[diasEspecif[i]][0][j]=0;
-                                    disp2[diasEspecif[i]][1][j]=ocupado2[diasEspecif[i]][0][j];
+                                    disp2[dias[i]][j].comeco = 0;
+                                    disp2[dias[i]][j].fim = ocupado2[dias[i]][j].comeco;
                                 }
-                                else if(j==cont2[diasEspecif[i]]+1) {
-                                    disp2[diasEspecif[i]][0][j]=ocupado2[diasEspecif[i]][1][j-1];
-                                    disp2[diasEspecif[i]][1][j]=24*60;
+                                else if(j == cont2[dias[i]] + 1) {
+                                    disp2[dias[i]][j].comeco = ocupado2[dias[i]][j-1].fim;
+                                    disp2[dias[i]][j].fim = 24*60;
                                 }
                                 else {
-                                    disp2[diasEspecif[i]][0][j]=ocupado2[diasEspecif[i]][1][j-1];
-                                    disp2[diasEspecif[i]][1][j]=ocupado2[diasEspecif[i]][0][j];
+                                    disp2[dias[i]][j].comeco = ocupado2[dias[i]][j-1].fim;
+                                    disp2[dias[i]][j].fim = ocupado2[dias[i]][j].comeco;
                                 }
                             }
 
                             printf("\nPeriodos de tempo disponiveis:\n");
-                            for(j=0; j<=cont2[diasEspecif[i]]+1; j++) {
-                                duracao[j]=disp2[diasEspecif[i]][1][j]-disp2[diasEspecif[i]][0][j];
+                            for(j=0; j <= cont2[dias[i]] + 1; j++) {
+                                duracao[j] = disp2[dias[i]][j].fim - disp2[dias[i]][j].comeco;
 
-                                if(duracao[j]!=0) { //para excluir periodos nulos
-                                    printf("> %02d:%02.0f - %02d:%02.0f\n", disp2[diasEspecif[i]][0][j]/60, (disp2[diasEspecif[i]][0][j]/60.0-disp2[diasEspecif[i]][0][j]/60)*60, disp2[diasEspecif[i]][1][j]/60, (disp2[diasEspecif[i]][1][j]/60.0-disp2[diasEspecif[i]][1][j]/60)*60);
-                                    printf("  Duracao: %02d:%02.0f\n\n", duracao[j]/60, (duracao[j]/60.0-duracao[j]/60)*60);
+                                if(duracao[j] != 0) { //para excluir periodos nulos
+                                    printf("> %02d:%02.0f - %02d:%02.0f\n", disp2[dias[i]][j].comeco/60, (disp2[dias[i]][j].comeco/60.0 - disp2[dias[i]][j].comeco/60)*60, disp2[dias[i]][j].fim/60, (disp2[dias[i]][j].fim/60.0 - disp2[dias[i]][j].fim/60)*60);
+                                    printf("  Duracao: %02d:%02.0f\n\n", duracao[j]/60, (duracao[j]/60.0 - duracao[j]/60)*60);
                                 }
                                 else if(j==1)
                                     printf("Nenhum\n");
@@ -812,74 +819,74 @@ int main() {
                             blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
                             
                             if(comecoDiaVet[i]>fimDiaVet[i]) {
-                                ocupado2[i][0][cont2[i]]=fimDiaVet[i];
-                                ocupado2[i][1][cont2[i]]=comecoDiaVet[i];
+                                ocupado2[i][cont2[i]].comeco = fimDiaVet[i];
+                                ocupado2[i][cont2[i]].fim = comecoDiaVet[i];
                             }
                             else if(comecoDiaVet[i]<fimDiaVet[i]) {
-                                ocupado2[i][0][cont2[i]]=fimDiaVet[i];
-                                ocupado2[i][1][cont2[i]]=24*60;
+                                ocupado2[i][cont2[i]].comeco = fimDiaVet[i];
+                                ocupado2[i][cont2[i]].fim = 24*60;
                                 cont2[i]++;
-                                ocupado2[i][0][cont2[i]]=0;
-                                ocupado2[i][1][cont2[i]]=comecoDiaVet[i];
+                                ocupado2[i][cont2[i]].comeco = 0;
+                                ocupado2[i][cont2[i]].fim = comecoDiaVet[i];
                             }
 
                             //select sort entre as entradas
-                            for(j=0; j<=cont2[i]-1; j++) {
-                                menor=100000;
-                                for(k=j; k<=cont2[i]; k++) {
-                                    if(ocupado2[i][0][k]<menor) {
-                                        menor=ocupado2[i][0][k];
-                                        posicaoMenor=k;
+                            for(j=0; j <= cont2[i]-1; j++) {
+                                menor = 100000;
+                                for(k=j; k <= cont2[i]; k++) {
+                                    if(ocupado2[i][k].comeco < menor) {
+                                        menor = ocupado2[i][k].comeco;
+                                        posicaoMenor = k;
                                     }
                                 }            
-                                aux=ocupado2[i][0][j];
-                                ocupado2[i][0][j]=ocupado2[i][0][posicaoMenor];
-                                ocupado2[i][0][posicaoMenor]=aux;
+                                aux = ocupado2[i][j].comeco;
+                                ocupado2[i][j].comeco = ocupado2[i][posicaoMenor].comeco;
+                                ocupado2[i][posicaoMenor].comeco = aux;
 
-                                aux=ocupado2[i][1][j];
-                                ocupado2[i][1][j]=ocupado2[i][1][posicaoMenor];
-                                ocupado2[i][1][posicaoMenor]=aux;
+                                aux = ocupado2[i][j].fim;
+                                ocupado2[i][j].fim = ocupado2[i][posicaoMenor].fim;
+                                ocupado2[i][posicaoMenor].fim = aux;
                             }
 
-                            // select sort se o ocupado2[0] for igual mas ocupado[1] diferente
-                            for(j=0; j<=cont2[i]; j+=numRepetidos+1) {
-                                numRepetidos=0;
-                                for(k=j+1; k<=cont2[i]; k++)
-                                    if(ocupado2[i][0][k]==ocupado2[i][0][j])
+                            // select sort se o ocupado2.comeco for igual mas ocupado.fim diferente
+                            for(j=0; j <= cont2[i]; j += numRepetidos+1) {
+                                numRepetidos = 0;
+                                for(k = j+1; k <= cont2[i]; k++)
+                                    if(ocupado2[i][k].comeco == ocupado2[i][j].comeco)
                                         numRepetidos++;
 
-                                for(k=j; k<=j+numRepetidos-1; k++) {
-                                    menor=100000;
-                                    for(l=j; l<=j+numRepetidos; l++) {
-                                        if(ocupado2[i][1][l]<menor) {
-                                            menor=ocupado2[i][1][l];
-                                            posicaoMenor=l;
+                                for(k=j; k <= j+numRepetidos-1; k++) {
+                                    menor = 100000;
+                                    for(l=j; l <= j+numRepetidos; l++) {
+                                        if(ocupado2[i][l].fim < menor) {
+                                            menor = ocupado2[i][l].fim;
+                                            posicaoMenor = l;
                                         }
                                     }            
-                                    aux=ocupado2[i][1][k];
-                                    ocupado2[i][1][k]=ocupado2[i][1][posicaoMenor];
-                                    ocupado2[i][1][posicaoMenor]=aux;
+                                    aux = ocupado2[i][k].fim;
+                                    ocupado2 [i][k].fim = ocupado2[i][posicaoMenor].fim;
+                                    ocupado2 [i][posicaoMenor].fim = aux;
                                 }
                             }
                             
                             //remover periodos de tempo redundantes
-                            for(j=1; j<=cont2[i]; j++) {
+                            for(j=1; j <= cont2[i]; j++) {
                                 //se um periodo estiver contido em outro, vamos exclui-lo
-                                if(ocupado2[i][0][j]>ocupado2[i][0][j-1] && ocupado2[i][1][j]<ocupado2[i][1][j-1]) {
-                                    for(k=j; k<=cont2[i]-1; k++) {
-                                        ocupado2[i][0][k]=ocupado2[i][0][k+1];
-                                        ocupado2[i][1][k]=ocupado2[i][1][k+1];
+                                if(ocupado2[i][j].comeco > ocupado2[i][j-1].comeco && ocupado2[i][j].fim < ocupado2[i][j-1].fim) {
+                                    for(k=j; k <= cont2[i]-1; k++) {
+                                        ocupado2[i][k].comeco = ocupado2[i][k+1].comeco;
+                                        ocupado2[i][k].fim = ocupado2[i][k+1].fim;
                                     }
                                     cont2[i]--; //um periodo a menos no vetor
                                     j--;
                                 }
 
                                 //se um periodo comecar antes ou quando outro acabar, vamos kunta-los
-                                else if(ocupado2[i][0][j]<=ocupado2[i][1][j-1]) {
-                                    ocupado2[i][1][j-1]=ocupado2[i][1][j];
-                                    for(k=j; k<=cont2[i]-1; k++) {
-                                        ocupado2[i][0][k]=ocupado2[i][0][k+1];
-                                        ocupado2[i][1][k]=ocupado2[i][1][k+1];
+                                else if(ocupado2[i][j].comeco <= ocupado2[i][j-1].fim) {
+                                    ocupado2[i][j-1].fim = ocupado2[i][j].fim;
+                                    for(k=j; k <= cont2[i]-1; k++) {
+                                        ocupado2[i][k].comeco = ocupado2[i][k+1].comeco;
+                                        ocupado2[i][k].fim = ocupado2[i][k+1].fim;
                                     }
                                     cont2[i]--; //um periodo a menos no vetor
                                     j--;
@@ -887,7 +894,7 @@ int main() {
                             }
 
                             //calculo dos tempos disponiveis
-                            for(j=0; j<=cont2[i]+1; j++) {
+                            for(j=0; j <= cont2[i]+1; j++) {
                                 /* No geral, os periodos disponiveis sao o intervalo entre o final de
                                 um periodo ocupado e comeco do seguinte.
                                 Para que o algoritmo seja generico, o primeiro periodo sera sempre
@@ -896,49 +903,49 @@ int main() {
                                 A mesma logica se aplica ao ultimo periodo disponivel. */
 
                                 if(j==0) {
-                                    disp2[i][0][j]=0;
-                                    disp2[i][1][j]=ocupado2[i][0][j];
+                                    disp2[i][j].comeco = 0;
+                                    disp2[i][j].fim = ocupado2[i][j].comeco;
                                 }
-                                else if(j==cont2[i]+1) {
-                                    disp2[i][0][j]=ocupado2[i][1][j-1];
-                                    disp2[i][1][j]=24*60;
+                                else if(j == cont2[i]+1) {
+                                    disp2[i][j].comeco = ocupado2[i][j-1].fim;
+                                    disp2[i][j].fim = 24*60;
                                 }
                                 else {
-                                    disp2[i][0][j]=ocupado2[i][1][j-1];
-                                    disp2[i][1][j]=ocupado2[i][0][j];
+                                    disp2[i][j].comeco = ocupado2[i][j-1].fim;
+                                    disp2[i][j].fim = ocupado2[i][j].comeco;
                                 }
                             }
 
                             switch(i) {
-                                case 0:
+                                case dom:
                                     printf("\nDOMINGO\n");
                                     break;
-                                case 1:
+                                case seg:
                                     printf("\nSEGUNDA-FEIRA\n");
                                     break;
-                                case 2:
+                                case ter:
                                     printf("\nTERCA-FEIRA\n");
                                     break;
-                                case 3:
+                                case qua:
                                     printf("\nQUARTA-FEIRA\n");
                                     break;
-                                case 4:
+                                case qui:
                                     printf("\nQUINTA-FEIRA\n");
                                     break;
-                                case 5:
+                                case sex:
                                     printf("\nSEXTA-FEIRA\n");
                                     break;
-                                case 6:
+                                case sab:
                                     printf("\nSABADO\n");
                             }
 
                             printf("Periodos de tempo disponiveis:\n");
-                            for(j=0; j<=cont2[i]+1; j++) {
-                                duracao[j]=disp2[i][1][j]-disp2[i][0][j];
+                            for(j=0; j <= cont2[i] + 1; j++) {
+                                duracao[j] = disp2[i][j].fim - disp2[i][j].comeco;
 
-                                if(duracao[j]!=0) { //para excluir periodos nulos
-                                    printf("> %02d:%02.0f - %02d:%02.0f\n", disp2[i][0][j]/60, (disp2[i][0][j]/60.0-disp2[i][0][j]/60)*60, disp2[i][1][j]/60, (disp2[i][1][j]/60.0-disp2[i][1][j]/60)*60);
-                                    printf("  Duracao: %02d:%02.0f\n\n", duracao[j]/60, (duracao[j]/60.0-duracao[j]/60)*60);
+                                if(duracao[j] != 0) { //para excluir periodos nulos
+                                    printf("> %02d:%02.0f - %02d:%02.0f\n", disp2[i][j].comeco/60, (disp2[i][j].comeco/60.0 - disp2[i][j].comeco/60)*60, disp2[i][j].fim/60, (disp2[i][j].fim/60.0 - disp2[i][j].fim/60)*60);
+                                    printf("  Duracao: %02d:%02.0f\n\n", duracao[j]/60, (duracao[j]/60.0 - duracao[j]/60)*60);
                                 }
                                 else if(j==1)
                                     printf("Nenhum\n");
@@ -973,134 +980,133 @@ int main() {
                     else if(opcao=='1') {
                         //quantidade de dias
                         printf("\nQuantidade de dias: ");
-                        scanf("%d", &qtdeDias);
-
-                        getchar();
+                        scanf("%d", &qtdDias);
 
                         //lendo os dias
-                        for(i=0; i<qtdeDias; ) {
+                        for(i=0; i<qtdDias; ) {
                             printf("\nDia %d: ", i+1);
-                            gets(dia);
-                            if(stricmp(dia, diaAnterior)==0)
+                            fflush(stdin);
+                            gets(diaString);
+                            if(stricmp(diaString, diaAnterior)==0)
                                 printf("Dia da semana repetido! Por favor, insira novamente.\n");
-                            else if(stricmp(dia, "Domingo")==0 || stricmp(dia, "domingo")==0 || stricmp(dia, "DOMINGO")==0) {
-                                diasEspecif[i]=0;
+                            else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
+                                dias[i]=dom;
                                 i++;
                             }
-                            else if(stricmp(dia, "Segunda")==0 || stricmp(dia, "segunda")==0 || stricmp(dia, "SEGUNDA")==0 || stricmp(dia, "Segunda-feira")==0 || stricmp(dia, "segunda-feira")==0 || stricmp(dia, "SEGUNDA-FEIRA")==0) {
-                                diasEspecif[i]=1;
+                            else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
+                                dias[i]=seg;
                                 i++;
                             }
-                            else if(stricmp(dia, "Terca")==0 || stricmp(dia, "terca")==0 || stricmp(dia, "TERCA")==0 || stricmp(dia, "Terca-feira")==0 || stricmp(dia, "terca-feira")==0 || stricmp(dia, "TERCA-FEIRA")==0) {
-                                diasEspecif[i]=2;
+                            else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
+                                dias[i]=ter;
                                 i++;
                             }
-                            else if(stricmp(dia, "Quarta")==0 || stricmp(dia, "quarta")==0 || stricmp(dia, "QUARTA")==0 || stricmp(dia, "Quarta-feira")==0 || stricmp(dia, "quarta-feira")==0 || stricmp(dia, "QUARTA-FEIRA")==0) {
-                                diasEspecif[i]=3;
+                            else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
+                                dias[i]=qua;
                                 i++;
                             }
-                            else if(stricmp(dia, "Quinta")==0 || stricmp(dia, "quinta")==0 || stricmp(dia, "QUINTA")==0 || stricmp(dia, "Quinta-feira")==0 || stricmp(dia, "quinta-feira")==0 || stricmp(dia, "QUINTA-FEIRA")==0) {
-                                diasEspecif[i]=4;
+                            else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
+                                dias[i]=qui;
                                 i++;
                             }
-                            else if(stricmp(dia, "Sexta")==0 || stricmp(dia, "sexta")==0 || stricmp(dia, "SEXTA")==0 || stricmp(dia, "Sexta-feira")==0 || stricmp(dia, "sexta-feira")==0 || stricmp(dia, "SEXTA-FEIRA")==0) {
-                                diasEspecif[i]=5;
+                            else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
+                                dias[i]=sex;
                                 i++;
                             }
-                            else if(stricmp(dia, "Sabado")==0 || stricmp(dia, "sabado")==0 || stricmp(dia, "SABADO")==0) {
-                                diasEspecif[i]=6;
+                            else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
+                                dias[i]=sab;
                                 i++;
                             }
                             else
                                 printf("Dia da semana invalido! Por favor, insira novamente.\n");
 
-                            strcpy(diaAnterior, dia);
+                            strcpy(diaAnterior, diaString);
                         }
 
-                        for(i=0; i<qtdeDias; i++) {
+                        for(i=0; i<qtdDias; i++) {
                             /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
                             Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
                             seu tempo de sono pode ser considerado um bloco de tempo ocupado.
                             Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
                             blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
                             
-                            if(comecoDiaVet[diasEspecif[i]]>fimDiaVet[diasEspecif[i]]) {
-                                ocupado2[diasEspecif[i]][0][cont2[diasEspecif[i]]]=fimDiaVet[diasEspecif[i]];
-                                ocupado2[diasEspecif[i]][1][cont2[diasEspecif[i]]]=comecoDiaVet[diasEspecif[i]];
+                            if(comecoDiaVet[dias[i]] > fimDiaVet[dias[i]]) {
+                                ocupado2[dias[i]][cont2[dias[i]]].comeco = fimDiaVet[dias[i]];
+                                ocupado2[dias[i]][cont2[dias[i]]].fim = comecoDiaVet[dias[i]];
                             }
-                            else if(comecoDiaVet[diasEspecif[i]]<fimDiaVet[diasEspecif[i]]) {
-                                ocupado2[diasEspecif[i]][0][cont2[diasEspecif[i]]]=fimDiaVet[diasEspecif[i]];
-                                ocupado2[diasEspecif[i]][1][cont2[diasEspecif[i]]]=24*60;
-                                cont2[diasEspecif[i]]++;
-                                ocupado2[diasEspecif[i]][0][cont2[diasEspecif[i]]]=0;
-                                ocupado2[diasEspecif[i]][1][cont2[diasEspecif[i]]]=comecoDiaVet[diasEspecif[i]];
+                            else if(comecoDiaVet[dias[i]] < fimDiaVet[dias[i]]) {
+                                ocupado2[dias[i]][cont2[dias[i]]].comeco = fimDiaVet[dias[i]];
+                                ocupado2[dias[i]][cont2[dias[i]]].fim = 24*60;
+                                cont2[dias[i]]++;
+                                ocupado2[dias[i]][cont2[dias[i]]].comeco = 0;
+                                ocupado2[dias[i]][cont2[dias[i]]].fim = comecoDiaVet[dias[i]];
                             }
 
                             //select sort entre as entradas
-                            for(j=0; j<=cont2[diasEspecif[i]]-1; j++) {
-                                menor=100000;
-                                for(k=j; k<=cont2[diasEspecif[i]]; k++) {
-                                    if(ocupado2[diasEspecif[i]][0][k]<menor) {
-                                        menor=ocupado2[diasEspecif[i]][0][k];
-                                        posicaoMenor=k;
+                            for(j=0; j <= cont2[dias[i]]-1; j++) {
+                                menor = 100000;
+                                for(k=j; k <= cont2[dias[i]]; k++) {
+                                    if(ocupado2[dias[i]][k].comeco < menor) {
+                                        menor = ocupado2[dias[i]][k].comeco;
+                                        posicaoMenor = k;
                                     }
                                 }            
-                                aux=ocupado2[diasEspecif[i]][0][j];
-                                ocupado2[diasEspecif[i]][0][j]=ocupado2[diasEspecif[i]][0][posicaoMenor];
-                                ocupado2[diasEspecif[i]][0][posicaoMenor]=aux;
+                                aux = ocupado2[dias[i]][j].comeco;
+                                ocupado2[dias[i]][j].comeco = ocupado2[dias[i]][posicaoMenor].comeco;
+                                ocupado2[dias[i]][posicaoMenor].comeco = aux;
 
-                                aux=ocupado2[diasEspecif[i]][1][j];
-                                ocupado2[diasEspecif[i]][1][j]=ocupado2[diasEspecif[i]][1][posicaoMenor];
-                                ocupado2[diasEspecif[i]][1][posicaoMenor]=aux;
+                                aux = ocupado2[dias[i]][j].fim;
+                                ocupado2[dias[i]][j].fim = ocupado2[dias[i]][posicaoMenor].fim;
+                                ocupado2[dias[i]][posicaoMenor].fim = aux;
                             }
 
-                            // select sort se o ocupado2[0] for igual mas ocupado[1] diferente
-                            for(j=0; j<=cont2[diasEspecif[i]]; j+=numRepetidos+1) {
-                                numRepetidos=0;
-                                for(k=j+1; k<=cont2[diasEspecif[i]]; k++)
-                                    if(ocupado2[diasEspecif[i]][0][k]==ocupado2[diasEspecif[i]][0][j])
+                            // select sort se o ocupado2.comeco for igual mas ocupado.fim diferente
+                            for(j=0; j <= cont2[dias[i]]; j += numRepetidos+1) {
+                                numRepetidos = 0;
+                                for(k = j+1; k <= cont2[dias[i]]; k++)
+                                    if(ocupado2[dias[i]][k].comeco == ocupado2[dias[i]][j].comeco)
                                         numRepetidos++;
 
-                                for(k=j; k<=j+numRepetidos-1; k++) {
-                                    menor=100000;
-                                    for(l=j; l<=j+numRepetidos; l++) {
-                                        if(ocupado2[diasEspecif[i]][1][l]<menor) {
-                                            menor=ocupado2[diasEspecif[i]][1][l];
-                                            posicaoMenor=l;
+                                for(k=j; k <= j+numRepetidos-1; k++) {
+                                    menor = 100000;
+                                    for(l=j; l <= j+numRepetidos; l++) {
+                                        if(ocupado2[dias[i]][l].fim < menor) {
+                                            menor = ocupado2[dias[i]][l].fim;
+                                            posicaoMenor = l;
                                         }
                                     }            
-                                    aux=ocupado2[diasEspecif[i]][1][k];
-                                    ocupado2[diasEspecif[i]][1][k]=ocupado2[diasEspecif[i]][1][posicaoMenor];
-                                    ocupado2[diasEspecif[i]][1][posicaoMenor]=aux;
+                                    aux = ocupado2[dias[i]][k].fim;
+                                    ocupado2[dias[i]][k].fim = ocupado2[dias[i]][posicaoMenor].fim;
+                                    ocupado2[dias[i]][posicaoMenor].fim = aux;
                                 }
                             }
                             
                             //remover periodos de tempo redundantes
-                            for(j=1; j<=cont2[diasEspecif[i]]; j++) {
+                            for(j=1; j <= cont2[dias[i]]; j++) {
                                 //se um periodo estiver contido em outro, vamos exclui-lo
-                                if(ocupado2[diasEspecif[i]][0][j]>ocupado2[diasEspecif[i]][0][j-1] && ocupado2[diasEspecif[i]][1][j]<ocupado2[diasEspecif[i]][1][j-1]) {
-                                    for(k=j; k<=cont2[diasEspecif[i]]-1; k++) {
-                                        ocupado2[diasEspecif[i]][0][k]=ocupado2[diasEspecif[i]][0][k+1];
-                                        ocupado2[diasEspecif[i]][1][k]=ocupado2[diasEspecif[i]][1][k+1];
+                                if(ocupado2[dias[i]][j].comeco > ocupado2[dias[i]][j-1].comeco && ocupado2[dias[i]][j].fim < ocupado2[dias[i]][j-1].fim) {
+                                    for(k=j; k <= cont2[dias[i]]-1; k++) {
+                                        ocupado2[dias[i]][k].comeco = ocupado2[dias[i]][k+1].comeco;
+                                        ocupado2[dias[i]][k].fim = ocupado2[dias[i]][k+1].fim;
                                     }
-                                    cont2[diasEspecif[i]]--; //um periodo a menos no vetor
+                                    cont2[dias[i]]--; //um periodo a menos no vetor
                                     j--;
                                 }
 
                                 //se um periodo comecar antes ou quando outro acabar, vamos kunta-los
-                                else if(ocupado2[diasEspecif[i]][0][j]<=ocupado2[diasEspecif[i]][1][j-1]) {
-                                    ocupado2[diasEspecif[i]][1][j-1]=ocupado2[diasEspecif[i]][1][j];
-                                    for(k=j; k<=cont2[diasEspecif[i]]-1; k++) {
-                                        ocupado2[diasEspecif[i]][0][k]=ocupado2[diasEspecif[i]][0][k+1];
-                                        ocupado2[diasEspecif[i]][1][k]=ocupado2[diasEspecif[i]][1][k+1];
+                                else if(ocupado2[dias[i]][j].comeco <= ocupado2[dias[i]][j-1].fim) {
+                                    ocupado2[dias[i]][j-1].fim = ocupado2[dias[i]][j].fim;
+                                    for(k=j; k <= cont2[dias[i]]-1; k++) {
+                                        ocupado2[dias[i]][k].comeco = ocupado2[dias[i]][k+1].comeco;
+                                        ocupado2[dias[i]][k].fim = ocupado2[dias[i]][k+1].fim;
                                     }
-                                    cont2[diasEspecif[i]]--; //um periodo a menos no vetor
+                                    cont2[dias[i]]--; //um periodo a menos no vetor
                                     j--;
                                 }
                             }
 
                             //calculo dos tempos disponiveis
-                            for(j=0; j<=cont2[diasEspecif[i]]+1; j++) {
+                            for(j=0; j <= cont2[dias[i]] + 1; j++) {
                                 /* No geral, os periodos disponiveis sao o intervalo entre o final de
                                 um periodo ocupado e comeco do seguinte.
                                 Para que o algoritmo seja generico, o primeiro periodo sera sempre
@@ -1109,49 +1115,49 @@ int main() {
                                 A mesma logica se aplica ao ultimo periodo disponivel. */
 
                                 if(j==0) {
-                                    disp2[diasEspecif[i]][0][j]=0;
-                                    disp2[diasEspecif[i]][1][j]=ocupado2[diasEspecif[i]][0][j];
+                                    disp2[dias[i]][j].comeco = 0;
+                                    disp2[dias[i]][j].fim = ocupado2[dias[i]][j].comeco;
                                 }
-                                else if(j==cont2[diasEspecif[i]]+1) {
-                                    disp2[diasEspecif[i]][0][j]=ocupado2[diasEspecif[i]][1][j-1];
-                                    disp2[diasEspecif[i]][1][j]=24*60;
+                                else if(j == cont2[dias[i]] + 1) {
+                                    disp2[dias[i]][j].comeco = ocupado2[dias[i]][j-1].fim;
+                                    disp2[dias[i]][j].fim = 24*60;
                                 }
                                 else {
-                                    disp2[diasEspecif[i]][0][j]=ocupado2[diasEspecif[i]][1][j-1];
-                                    disp2[diasEspecif[i]][1][j]=ocupado2[diasEspecif[i]][0][j];
+                                    disp2[dias[i]][j].comeco = ocupado2[dias[i]][j-1].fim;
+                                    disp2[dias[i]][j].fim = ocupado2[dias[i]][j].comeco;
                                 }
                             }
 
-                            switch(diasEspecif[i]) {
-                                case 0:
+                            switch(dias[i]) {
+                                case dom:
                                     fp=fopen("horarios_domingo.txt", "w");
                                     break;
-                                case 1:
+                                case seg:
                                     fp=fopen("horarios_segunda.txt", "w");
                                     break;
-                                case 2:
+                                case ter:
                                     fp=fopen("horarios_terca.txt", "w");
                                     break;
-                                case 3:
+                                case qua:
                                     fp=fopen("horarios_quarta.txt", "w");
                                     break;
-                                case 4:
+                                case qui:
                                     fp=fopen("horarios_quinta.txt", "w");
                                     break;
-                                case 5:
+                                case sex:
                                     fp=fopen("horarios_sexta.txt", "w");
                                     break;
-                                case 6:
+                                case sab:
                                     fp=fopen("horarios_sabado.txt", "w");
                             }
 
                             fprintf(fp, "Periodos de tempo disponiveis:\n");
-                            for(j=0; j<=cont2[diasEspecif[i]]+1; j++) {
-                                duracao[j]=disp2[diasEspecif[i]][1][j]-disp2[diasEspecif[i]][0][j];
+                            for(j=0; j <= cont2[dias[i]] + 1; j++) {
+                                duracao[j] = disp2[dias[i]][j].fim - disp2[dias[i]][j].comeco;
 
-                                if(duracao[j]!=0) { //para excluir periodos nulos
-                                    fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp2[diasEspecif[i]][0][j]/60, (disp2[diasEspecif[i]][0][j]/60.0-disp2[diasEspecif[i]][0][j]/60)*60, disp2[diasEspecif[i]][1][j]/60, (disp2[diasEspecif[i]][1][j]/60.0-disp2[diasEspecif[i]][1][j]/60)*60);
-                                    fprintf(fp, "  Duracao: %02d:%02.0f\n", duracao[j]/60, (duracao[j]/60.0-duracao[j]/60)*60);
+                                if(duracao[j] != 0) { //para excluir periodos nulos
+                                    fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp2[dias[i]][j].comeco/60, (disp2[dias[i]][j].comeco/60.0 - disp2[dias[i]][j].comeco/60)*60, disp2[dias[i]][j].fim/60, (disp2[dias[i]][j].fim/60.0 - disp2[dias[i]][j].fim/60)*60);
+                                    fprintf(fp, "  Duracao: %02d:%02.0f\n", duracao[j]/60, (duracao[j]/60.0 - duracao[j]/60)*60);
                                 }
                                 else if(j==1)
                                     fprintf(fp, "Nenhum\n");
@@ -1171,74 +1177,74 @@ int main() {
                             blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
                             
                             if(comecoDiaVet[i]>fimDiaVet[i]) {
-                                ocupado2[i][0][cont2[i]]=fimDiaVet[i];
-                                ocupado2[i][1][cont2[i]]=comecoDiaVet[i];
+                                ocupado2[i][cont2[i]].comeco = fimDiaVet[i];
+                                ocupado2[i][cont2[i]].fim = comecoDiaVet[i];
                             }
                             else if(comecoDiaVet[i]<fimDiaVet[i]) {
-                                ocupado2[i][0][cont2[i]]=fimDiaVet[i];
-                                ocupado2[i][1][cont2[i]]=24*60;
+                                ocupado2[i][cont2[i]].comeco = fimDiaVet[i];
+                                ocupado2[i][cont2[i]].fim = 24*60;
                                 cont2[i]++;
-                                ocupado2[i][0][cont2[i]]=0;
-                                ocupado2[i][1][cont2[i]]=comecoDiaVet[i];
+                                ocupado2[i][cont2[i]].comeco = 0;
+                                ocupado2[i][cont2[i]].fim = comecoDiaVet[i];
                             }
 
                             //select sort entre as entradas
-                            for(j=0; j<=cont2[i]-1; j++) {
-                                menor=100000;
-                                for(k=j; k<=cont2[i]; k++) {
-                                    if(ocupado2[i][0][k]<menor) {
-                                        menor=ocupado2[i][0][k];
-                                        posicaoMenor=k;
+                            for(j=0; j <= cont2[i]-1; j++) {
+                                menor = 100000;
+                                for(k=j; k <= cont2[i]; k++) {
+                                    if(ocupado2[i][k].comeco < menor) {
+                                        menor = ocupado2[i][k].comeco;
+                                        posicaoMenor = k;
                                     }
                                 }            
-                                aux=ocupado2[i][0][j];
-                                ocupado2[i][0][j]=ocupado2[i][0][posicaoMenor];
-                                ocupado2[i][0][posicaoMenor]=aux;
+                                aux = ocupado2[i][j].comeco;
+                                ocupado2[i][j].comeco = ocupado2[i][posicaoMenor].comeco;
+                                ocupado2[i][posicaoMenor].comeco = aux;
 
-                                aux=ocupado2[i][1][j];
-                                ocupado2[i][1][j]=ocupado2[i][1][posicaoMenor];
-                                ocupado2[i][1][posicaoMenor]=aux;
+                                aux = ocupado2[i][j].fim;
+                                ocupado2[i][j].fim = ocupado2[i][posicaoMenor].fim;
+                                ocupado2[i][posicaoMenor].fim = aux;
                             }
 
-                            // select sort se o ocupado2[0] for igual mas ocupado[1] diferente
-                            for(j=0; j<=cont2[i]; j+=numRepetidos+1) {
-                                numRepetidos=0;
+                            // select sort se o ocupado2.comeco for igual mas ocupado.fim diferente
+                            for(j=0; j <= cont2[i]; j += numRepetidos+1) {
+                                numRepetidos = 0;
                                 for(k=j+1; k<=cont2[i]; k++)
-                                    if(ocupado2[i][0][k]==ocupado2[i][0][j])
+                                    if(ocupado2[i][k].comeco == ocupado2[i][j].comeco)
                                         numRepetidos++;
 
-                                for(k=j; k<=j+numRepetidos-1; k++) {
-                                    menor=100000;
-                                    for(l=j; l<=j+numRepetidos; l++) {
-                                        if(ocupado2[i][1][l]<menor) {
-                                            menor=ocupado2[i][1][l];
-                                            posicaoMenor=l;
+                                for(k=j; k <= j+numRepetidos-1; k++) {
+                                    menor = 100000;
+                                    for(l=j; l <= j+numRepetidos; l++) {
+                                        if(ocupado2[i][l].fim < menor) {
+                                            menor = ocupado2[i][l].fim;
+                                            posicaoMenor = l;
                                         }
                                     }            
-                                    aux=ocupado2[i][1][k];
-                                    ocupado2[i][1][k]=ocupado2[i][1][posicaoMenor];
-                                    ocupado2[i][1][posicaoMenor]=aux;
+                                    aux = ocupado2[i][k].fim;
+                                    ocupado2[i][k].fim = ocupado2[i][posicaoMenor].fim;
+                                    ocupado2[i][posicaoMenor].fim = aux;
                                 }
                             }
                             
                             //remover periodos de tempo redundantes
-                            for(j=1; j<=cont2[i]; j++) {
+                            for(j=1; j <= cont2[i]; j++) {
                                 //se um periodo estiver contido em outro, vamos exclui-lo
-                                if(ocupado2[i][0][j]>ocupado2[i][0][j-1] && ocupado2[i][1][j]<ocupado2[i][1][j-1]) {
-                                    for(k=j; k<=cont2[i]-1; k++) {
-                                        ocupado2[i][0][k]=ocupado2[i][0][k+1];
-                                        ocupado2[i][1][k]=ocupado2[i][1][k+1];
+                                if(ocupado2[i][j].comeco > ocupado2[i][j-1].comeco && ocupado2[i][j].fim < ocupado2[i][j-1].fim) {
+                                    for(k=j; k <= cont2[i]-1; k++) {
+                                        ocupado2[i][k].comeco = ocupado2[i][k+1].comeco;
+                                        ocupado2[i][k].fim = ocupado2[i][k+1].fim;
                                     }
                                     cont2[i]--; //um periodo a menos no vetor
                                     j--;
                                 }
 
                                 //se um periodo comecar antes ou quando outro acabar, vamos kunta-los
-                                else if(ocupado2[i][0][j]<=ocupado2[i][1][j-1]) {
-                                    ocupado2[i][1][j-1]=ocupado2[i][1][j];
-                                    for(k=j; k<=cont2[i]-1; k++) {
-                                        ocupado2[i][0][k]=ocupado2[i][0][k+1];
-                                        ocupado2[i][1][k]=ocupado2[i][1][k+1];
+                                else if(ocupado2[i][j].comeco <= ocupado2[i][j-1].fim) {
+                                    ocupado2[i][j-1].fim = ocupado2[i][j].fim;
+                                    for(k=j; k <= cont2[i]-1; k++) {
+                                        ocupado2[i][k].comeco = ocupado2[i][k+1].comeco;
+                                        ocupado2[i][k].fim = ocupado2[i][k+1].fim;
                                     }
                                     cont2[i]--; //um periodo a menos no vetor
                                     j--;
@@ -1246,7 +1252,7 @@ int main() {
                             }
 
                             //calculo dos tempos disponiveis
-                            for(j=0; j<=cont2[i]+1; j++) {
+                            for(j=0; j <= cont2[i]+1; j++) {
                                 /* No geral, os periodos disponiveis sao o intervalo entre o final de
                                 um periodo ocupado e comeco do seguinte.
                                 Para que o algoritmo seja generico, o primeiro periodo sera sempre
@@ -1255,49 +1261,49 @@ int main() {
                                 A mesma logica se aplica ao ultimo periodo disponivel. */
 
                                 if(j==0) {
-                                    disp2[i][0][j]=0;
-                                    disp2[i][1][j]=ocupado2[i][0][j];
+                                    disp2[i][j].comeco = 0;
+                                    disp2[i][j].fim = ocupado2[i][j].comeco;
                                 }
-                                else if(j==cont2[i]+1) {
-                                    disp2[i][0][j]=ocupado2[i][1][j-1];
-                                    disp2[i][1][j]=24*60;
+                                else if(j == cont2[i]+1) {
+                                    disp2[i][j].comeco = ocupado2[i][j-1].fim;
+                                    disp2[i][j].fim = 24*60;
                                 }
                                 else {
-                                    disp2[i][0][j]=ocupado2[i][1][j-1];
-                                    disp2[i][1][j]=ocupado2[i][0][j];
+                                    disp2[i][j].comeco = ocupado2[i][j-1].fim;
+                                    disp2[i][j].fim = ocupado2[i][j].comeco;
                                 }
                             }
 
                             switch(i) {
-                                case 0:
+                                case dom:
                                     fprintf(fp, "\nDOMINGO\n");
                                     break;
-                                case 1:
+                                case seg:
                                     fprintf(fp, "\nSEGUNDA-FEIRA\n");
                                     break;
-                                case 2:
+                                case ter:
                                     fprintf(fp, "\nTERCA-FEIRA\n");
                                     break;
-                                case 3:
+                                case qua:
                                     fprintf(fp, "\nQUARTA-FEIRA\n");
                                     break;
-                                case 4:
+                                case qui:
                                     fprintf(fp, "\nQUINTA-FEIRA\n");
                                     break;
-                                case 5:
+                                case sex:
                                     fprintf(fp, "\nSEXTA-FEIRA\n");
                                     break;
-                                case 6:
+                                case sab:
                                     fprintf(fp, "\nSABADO\n");
                             }
 
                             fprintf(fp, "Periodos de tempo disponiveis:\n");
-                            for(j=0; j<=cont2[i]+1; j++) {
-                                duracao[j]=disp2[i][1][j]-disp2[i][0][j];
+                            for(j=0; j <= cont2[i]+1; j++) {
+                                duracao[j] = disp2[i][j].fim - disp2[i][j].comeco;
 
-                                if(duracao[j]!=0) { //para excluir periodos nulos
-                                    fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp2[i][0][j]/60, (disp2[i][0][j]/60.0-disp2[i][0][j]/60)*60, disp2[i][1][j]/60, (disp2[i][1][j]/60.0-disp2[i][1][j]/60)*60);
-                                    fprintf(fp, "  Duracao: %02d:%02.0f\n", duracao[j]/60, (duracao[j]/60.0-duracao[j]/60)*60);
+                                if(duracao[j] != 0) { //para excluir periodos nulos
+                                    fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp2[i][j].comeco/60, (disp2[i][j].comeco/60.0 - disp2[i][j].comeco/60)*60, disp2[i][j].fim/60, ((disp2[i][j].fim/60.0) - (disp2[i][j].fim/60))*60);
+                                    fprintf(fp, "  Duracao: %02d:%02.0f\n", duracao[j]/60, (duracao[j]/60.0 - duracao[j]/60)*60);
                                 }
                                 else if(j==1)
                                     fprintf(fp, "Nenhum\n");
