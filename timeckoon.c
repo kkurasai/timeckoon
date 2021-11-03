@@ -27,7 +27,7 @@ int main() {
     //variaveis comuns
     Horario menor;
     Iterador i, j, k, l;
-    int h, min, aux, posicaoMenor, numRepetidos;    
+    int h, min, aux, posicaoMenor, numRepetidos;
 
     //variaveis do menu de semana
     Horario comecoDiaVet[7], fimDiaVet[7];
@@ -456,6 +456,9 @@ int main() {
                             printf("Opcao invalida! Por favor, insira novamente.\n");
                     }
 
+                    if(opcao=='0')
+                        continue;
+                    
                     //lendo os dias os dias, caso for definir para dias especificos
                     if(opcao=='2') {
                         //quantidade de dias
@@ -641,6 +644,9 @@ int main() {
                             printf("Opcao invalida! Por favor, insira novamente.\n");
                     }
 
+                    if(opcao=='0')
+                        continue;
+                    
                     //dias especificos
                     if(opcao=='1') {
                         //quantidade de dias
@@ -974,7 +980,7 @@ int main() {
                     }
 
                     if(opcao=='0')
-                        break;
+                        continue;
 
                     //dias especificos
                     else if(opcao=='1') {
