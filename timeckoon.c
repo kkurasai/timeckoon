@@ -49,8 +49,15 @@ int main() {
               
         //menu geral
         system("cls");
-        printf(">>>>>  T I M E C K O O N  <<<<<\n\n");
-        printf("Uma calculadora de tempos disponiveis entre os membros de um grupo!\n\n");
+        printf("88888888888 d8b                                 888                                 \n");
+        printf("    888     Y8P                                 888                                 \n");
+        printf("    888                                         888                                 \n");
+        printf("    888     888 88888b.d88b.   .d88b.   .d8888b 888  888  .d88b.   .d88b.  88888b.  \n");
+        printf("    888     888 888 \"888 \"88b d8P  Y8b d88P\"    888 .88P d88\"\"88b d88\"\"88b 888 \"88b \n");
+        printf("    888     888 888  888  888 88888888 888      888888K  888  888 888  888 888  888 \n");
+        printf("    888     888 888  888  888 Y8b.     Y88b.    888 \"88b Y88..88P Y88..88P 888  888 \n");
+        printf("    888     888 888  888  888  \"Y8888   \"Y8888P 888  888  \"Y88P\"   \"Y88P\"  888  888 \n\n\n");
+        printf("\tUma calculadora de tempos disponiveis entre os membros de um grupo!\n\n\n");
         printf("[0] Sair do programa\n");
         printf("[1] Calcular horarios disponiveis em um dia qualquer\n");
         printf("[2] Calcular horarios disponiveis em uma semana\n");
@@ -62,7 +69,7 @@ int main() {
             if(opcao=='0'||opcao=='1'||opcao=='2')
                 break;                
             else
-                printf("Opcao invalida! Por favor, insira novamente.\n");
+                printf("\nOpcao invalida! Por favor, insira novamente.\n");
         }
      
         //sair do programa
@@ -74,8 +81,15 @@ int main() {
         else if(opcao=='1') {        
             while(1) {
                 system("cls");
-                printf(">>>>>  T I M E C K O O N  <<<<<\n\n");
-                printf("Uma calculadora de tempos disponiveis entre os membros de um grupo!\n\n");
+                printf("88888888888 d8b                                 888                                 \n");
+                printf("    888     Y8P                                 888                                 \n");
+                printf("    888                                         888                                 \n");
+                printf("    888     888 88888b.d88b.   .d88b.   .d8888b 888  888  .d88b.   .d88b.  88888b.  \n");
+                printf("    888     888 888 \"888 \"88b d8P  Y8b d88P\"    888 .88P d88\"\"88b d88\"\"88b 888 \"88b \n");
+                printf("    888     888 888  888  888 88888888 888      888888K  888  888 888  888 888  888 \n");
+                printf("    888     888 888  888  888 Y8b.     Y88b.    888 \"88b Y88..88P Y88..88P 888  888 \n");
+                printf("    888     888 888  888  888  \"Y8888   \"Y8888P 888  888  \"Y88P\"   \"Y88P\"  888  888 \n\n\n");
+                printf("\tUma calculadora de tempos disponiveis entre os membros de um grupo!\n\n\n");
                 printf("[0] Sair do menu\n");
                 printf("[1] Definir inicio e fim do dia\n");
                 printf("[2] Inserir um periodo de tempo ocupado\n");
@@ -90,7 +104,7 @@ int main() {
                     if(opcao=='0'||opcao=='1'||opcao=='2'||opcao=='3'||opcao=='4')
                         break;                
                     else
-                        printf("Opcao invalida! Por favor, insira novamente.\n");
+                        printf("\nOpcao invalida! Por favor, insira novamente.\n");
                 }
 
                 //sair do menu
@@ -106,7 +120,7 @@ int main() {
                         if(h*60+min>=0 && h*60+min<=24*60)
                             break;
                         else
-                            printf("Horario invalido! Por favor, insira novamente.\n");
+                            printf("\nHorario invalido! Por favor, insira novamente.\n");
                     }                        
                     comecoDia = h*60 + min;
 
@@ -117,7 +131,7 @@ int main() {
                         if(h*60+min>=0 && h*60+min<=24*60)
                             break;
                         else
-                            printf("Horario invalido! Por favor, insira novamente.\n");
+                            printf("\nHorario invalido! Por favor, insira novamente.\n");
                     }
                     fimDia = h*60 + min;
                 }                
@@ -132,7 +146,7 @@ int main() {
                             if(h*60+min>=0 && h*60+min<=24*60)
                                 break;
                             else
-                                printf("Horario invalido! Por favor, insira novamente.\n");
+                                printf("\nHorario invalido! Por favor, insira novamente.\n");
                         }
                         ocupado1[cont1].comeco = h*60 + min;
 
@@ -143,13 +157,13 @@ int main() {
                             if(h*60+min>=0 && h*60+min<=24*60)
                                 break;
                             else
-                                printf("Horario invalido! Por favor, insira novamente.\n");
+                                printf("\nHorario invalido! Por favor, insira novamente.\n");
                         }
                         ocupado1[cont1].fim = h*60 + min; //conversao para minutos
 
                         //validador do periodo
                         if(ocupado1[cont1].comeco >= ocupado1[cont1].fim)
-                            printf("Periodo invalido! Por favor, insira novamente.\n");
+                            printf("\nPeriodo invalido! Por favor, insira novamente.\n");
                         else {
                             cont1++;
                             break;
@@ -414,8 +428,15 @@ int main() {
             while(1) {
 
                 system("cls");
-                printf(">>>>>  T I M E C K O O N  <<<<<\n\n");
-                printf("Uma calculadora de tempos disponiveis entre os membros de um grupo!\n\n");
+                printf("88888888888 d8b                                 888                                 \n");
+                printf("    888     Y8P                                 888                                 \n");
+                printf("    888                                         888                                 \n");
+                printf("    888     888 88888b.d88b.   .d88b.   .d8888b 888  888  .d88b.   .d88b.  88888b.  \n");
+                printf("    888     888 888 \"888 \"88b d8P  Y8b d88P\"    888 .88P d88\"\"88b d88\"\"88b 888 \"88b \n");
+                printf("    888     888 888  888  888 88888888 888      888888K  888  888 888  888 888  888 \n");
+                printf("    888     888 888  888  888 Y8b.     Y88b.    888 \"88b Y88..88P Y88..88P 888  888 \n");
+                printf("    888     888 888  888  888  \"Y8888   \"Y8888P 888  888  \"Y88P\"   \"Y88P\"  888  888 \n\n\n");
+                printf("\tUma calculadora de tempos disponiveis entre os membros de um grupo!\n\n\n");
                 printf("[0] Sair do menu\n");
                 printf("[1] Definir inicio e fim do dia\n");
                 printf("[2] Definir dia da semana para inserir periodo de tempo\n");
@@ -432,7 +453,7 @@ int main() {
                     if(opcao=='0'||opcao=='1'||opcao=='2'||opcao=='3'||opcao=='4'||opcao=='5'||opcao=='6')
                         break;                
                     else
-                        printf("Opcao invalida! Por favor, insira novamente.\n");
+                        printf("\nOpcao invalida! Por favor, insira novamente.\n");
                 }
 
                 //sair do menu
@@ -453,7 +474,7 @@ int main() {
                         if(opcao=='0'||opcao=='1'||opcao=='2')
                             break;                                
                         else
-                            printf("Opcao invalida! Por favor, insira novamente.\n");
+                            printf("\nOpcao invalida! Por favor, insira novamente.\n");
                     }
 
                     if(opcao=='0')
@@ -471,7 +492,7 @@ int main() {
                             fflush(stdin);
                             gets(diaString);
                             if(stricmp(diaString, diaAnterior)==0)
-                                printf("Dia da semana repetido! Por favor, insira novamente.\n");
+                                printf("\nDia da semana repetido! Por favor, insira novamente.\n");
                             else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
                                 dias[i]=dom;
                                 i++;
@@ -501,7 +522,7 @@ int main() {
                                 i++;
                             }
                             else
-                                printf("Dia da semana invalido! Por favor, insira novamente.\n");
+                                printf("\nDia da semana invalido! Por favor, insira novamente.\n");
 
                             strcpy(diaAnterior, diaString);
                         }
@@ -514,7 +535,7 @@ int main() {
                         if(h*60+min>=0 && h*60+min<=24*60)
                             break;
                         else
-                            printf("Horario invalido! Por favor, insira novamente.\n");
+                            printf("\nHorario invalido! Por favor, insira novamente.\n");
                     }
 
                     //se for para todos os dias
@@ -533,7 +554,7 @@ int main() {
                         if(h*60+min>=0 && h*60+min<=24*60)
                             break;
                         else
-                            printf("Horario invalido! Por favor, insira novamente.\n");
+                            printf("\nHorario invalido! Por favor, insira novamente.\n");
                     }
 
                     //se for para todos os dias
@@ -581,7 +602,7 @@ int main() {
                             break;
                         }
                         else
-                            printf("Dia da semana invalido! Por favor, insira novamente.\n");
+                            printf("\nDia da semana invalido! Por favor, insira novamente.\n");
                     }
                 }
 
@@ -590,7 +611,7 @@ int main() {
                     while(1) {
                         //caso um dia nao tiver sido escolhido previamente
                         if(diaInserir==10) {
-                            printf("Voce precisa escolher o um dia primeiro!\n");
+                            printf("\nVoce precisa escolher o um dia primeiro!\n");
                             system("pause");
                             break;
                         }
@@ -602,7 +623,7 @@ int main() {
                             if(h*60+min>=0 && h*60+min<=24*60)
                                 break;
                             else
-                                printf("Horario invalido! Por favor, insira novamente.\n");
+                                printf("\nHorario invalido! Por favor, insira novamente.\n");
                         }
 
                         ocupado2[diaInserir][cont2[diaInserir]].comeco = h*60 + min;
@@ -614,12 +635,12 @@ int main() {
                             if(h*60+min>=0 && h*60+min<=24*60)
                                 break;
                             else
-                                printf("Horario invalido! Por favor, insira novamente.\n");
+                                printf("\nHorario invalido! Por favor, insira novamente.\n");
                         }
 
                         //validador de periodo
                         if(ocupado2[diaInserir][cont2[diaInserir]].comeco >= h*60 + min)
-                            printf("Periodo invalido! Por favor, insira novamente.\n");
+                            printf("\nPeriodo invalido! Por favor, insira novamente.\n");
                         else {
                             ocupado2[diaInserir][cont2[diaInserir]].fim = h*60 + min;
                             cont2[diaInserir]++;
@@ -641,7 +662,7 @@ int main() {
                         if(opcao=='0'||opcao=='1'||opcao=='2')
                             break;                                
                         else
-                            printf("Opcao invalida! Por favor, insira novamente.\n");
+                            printf("\nOpcao invalida! Por favor, insira novamente.\n");
                     }
 
                     if(opcao=='0')
@@ -659,7 +680,7 @@ int main() {
                             fflush(stdin);
                             gets(diaString);
                             if(stricmp(diaString, diaAnterior)==0)
-                                printf("Dia da semana repetido! Por favor, insira novamente.\n");
+                                printf("\nDia da semana repetido! Por favor, insira novamente.\n");
                             else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
                                 dias[i]=dom;
                                 i++;
@@ -689,7 +710,7 @@ int main() {
                                 i++;
                             }
                             else
-                                printf("Dia da semana invalido! Por favor, insira novamente.\n");
+                                printf("\nDia da semana invalido! Por favor, insira novamente.\n");
 
                             strcpy(diaAnterior, diaString);
                         }
@@ -976,7 +997,7 @@ int main() {
                         if(opcao=='0'||opcao=='1'||opcao=='2')
                             break;                                
                         else
-                            printf("Opcao invalida! Por favor, insira novamente.\n");
+                            printf("\nOpcao invalida! Por favor, insira novamente.\n");
                     }
 
                     if(opcao=='0')
@@ -994,7 +1015,7 @@ int main() {
                             fflush(stdin);
                             gets(diaString);
                             if(stricmp(diaString, diaAnterior)==0)
-                                printf("Dia da semana repetido! Por favor, insira novamente.\n");
+                                printf("\nDia da semana repetido! Por favor, insira novamente.\n");
                             else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
                                 dias[i]=dom;
                                 i++;
@@ -1024,7 +1045,7 @@ int main() {
                                 i++;
                             }
                             else
-                                printf("Dia da semana invalido! Por favor, insira novamente.\n");
+                                printf("\nDia da semana invalido! Por favor, insira novamente.\n");
 
                             strcpy(diaAnterior, diaString);
                         }
