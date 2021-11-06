@@ -4,73 +4,55 @@
 
 #define MAX 100
 
-typedef int Iterador;
-typedef int Horario;
+typedef int horario;
 
-typedef struct Periodo {
-    Horario comeco;
-    Horario fim;
-} Periodo;
+typedef struct periodo {
+    horario comeco;
+    horario fim;
+} periodo;
 
-enum DiaSemana {dom, seg, ter, qua, qui, sex, sab};
-typedef enum DiaSemana DiaSemana;
+enum diaSemana {dom, seg, ter, qua, qui, sex, sab};
+typedef enum diaSemana diaSemana;
+
+void banner();
+int validadorDeHorario(char comando[]);
+char validadorMiniMenu();
+void lerDias(diaSemana dias[7], int qtdDias);
+void horarioDeSono(int comecoDia[7], int fimDia[7], periodo ocupado[7][MAX], int cont[7], int dia);
+void selectSort(periodo ocupado[7][MAX], int cont[7], int dia);
+void selectSortMesmoComeco(periodo ocupado[7][MAX], int cont[7], int dia);
+void removerPeriodosRedundantes(periodo ocupado[7][MAX], int cont[7], int dia);
+void tempoDisponivel(periodo ocupado[7][MAX], periodo disp[7][MAX], int cont[7], int dia);
+void output(periodo disp[7][MAX], int cont[7], int dia);
 
 int main() {
 
     FILE * fp;
 
-    //variaveis do menu de dia unico
-    Horario comecoDia, fimDia;
-    Periodo ocupado1[MAX], disp1[MAX];
-    int cont1, duracao[MAX];    
-
-    //variaveis comuns
-    Horario menor;
-    Iterador i, j, k, l;
-    int h, min, aux, posicaoMenor, numRepetidos;
-
-    //variaveis do menu de semana
-    Horario comecoDiaVet[7], fimDiaVet[7];
-    Periodo ocupado2[7][MAX], disp2[7][MAX];
-    DiaSemana diaInserir, dias[7];
-    int qtdDias, cont2[7];
+    horario hora, comecoDia[7], fimDia[7];
+    periodo ocupado[7][MAX], disp[7][MAX];
+    diaSemana diaInserir, dias[7];
+    int i, j, k, qtdDias, cont[7], duracao[MAX];
     char opcao, diaString[20], diaAnterior[20];
 
     while(1) {
         //inicializando variaveis
         for(i=0; i<MAX; i++)
-            ocupado1[i].comeco = ocupado1[i].fim = disp1[i].comeco = disp1[i].fim = duracao[i]=0;
+            duracao[i]=0;
         for(i=0; i<7; i++) {
-            cont2[i] = comecoDiaVet[i] = fimDiaVet[i] = 0;
+            cont[i] = comecoDia[i] = fimDia[i] = 0;
             for(j=0; j<MAX; j++)
-                ocupado2[i][j].comeco = ocupado2[i][j].fim = disp2[i][j].comeco = disp2[i][j].fim = 0;
-        }        
-        cont1 = fimDia = comecoDia = 0;
+                ocupado[i][j].comeco = ocupado[i][j].fim = disp[i][j].comeco = disp[i][j].fim = 0;
+        }
               
         //menu geral
         system("cls");
-        printf("88888888888 d8b                                 888                                 \n");
-        printf("    888     Y8P                                 888                                 \n");
-        printf("    888                                         888                                 \n");
-        printf("    888     888 88888b.d88b.   .d88b.   .d8888b 888  888  .d88b.   .d88b.  88888b.  \n");
-        printf("    888     888 888 \"888 \"88b d8P  Y8b d88P\"    888 .88P d88\"\"88b d88\"\"88b 888 \"88b \n");
-        printf("    888     888 888  888  888 88888888 888      888888K  888  888 888  888 888  888 \n");
-        printf("    888     888 888  888  888 Y8b.     Y88b.    888 \"88b Y88..88P Y88..88P 888  888 \n");
-        printf("    888     888 888  888  888  \"Y8888   \"Y8888P 888  888  \"Y88P\"   \"Y88P\"  888  888 \n\n\n");
-        printf("\tUma calculadora de tempos disponiveis entre os membros de um grupo!\n\n\n");
+        banner();
         printf("[0] Sair do programa\n");
         printf("[1] Calcular horarios disponiveis em um dia qualquer\n");
         printf("[2] Calcular horarios disponiveis em uma semana\n");
 
-        //validador de opcao
-        while(1) {
-            printf("\nOpcao: ");
-            scanf(" %c", &opcao);
-            if(opcao=='0'||opcao=='1'||opcao=='2')
-                break;                
-            else
-                printf("\nOpcao invalida! Por favor, insira novamente.\n");
-        }
+        opcao = validadorMiniMenu();
      
         //sair do programa
         if(opcao=='0')
@@ -81,15 +63,7 @@ int main() {
         else if(opcao=='1') {        
             while(1) {
                 system("cls");
-                printf("88888888888 d8b                                 888                                 \n");
-                printf("    888     Y8P                                 888                                 \n");
-                printf("    888                                         888                                 \n");
-                printf("    888     888 88888b.d88b.   .d88b.   .d8888b 888  888  .d88b.   .d88b.  88888b.  \n");
-                printf("    888     888 888 \"888 \"88b d8P  Y8b d88P\"    888 .88P d88\"\"88b d88\"\"88b 888 \"88b \n");
-                printf("    888     888 888  888  888 88888888 888      888888K  888  888 888  888 888  888 \n");
-                printf("    888     888 888  888  888 Y8b.     Y88b.    888 \"88b Y88..88P Y88..88P 888  888 \n");
-                printf("    888     888 888  888  888  \"Y8888   \"Y8888P 888  888  \"Y88P\"   \"Y88P\"  888  888 \n\n\n");
-                printf("\tUma calculadora de tempos disponiveis entre os membros de um grupo!\n\n\n");
+                banner();
                 printf("[0] Sair do menu\n");
                 printf("[1] Definir inicio e fim do dia\n");
                 printf("[2] Inserir um periodo de tempo ocupado\n");
@@ -112,60 +86,22 @@ int main() {
                     break;
 
                 //definir inicio e fim do dia
-                else if(opcao=='1') {  
-                    //validador de entrada do inicio
-                    while(1) {
-                        printf("\nDigite o horario do inicio do dia: ");
-                        scanf("%d:%d", &h, &min);
-                        if(h*60+min>=0 && h*60+min<=24*60)
-                            break;
-                        else
-                            printf("\nHorario invalido! Por favor, insira novamente.\n");
-                    }                        
-                    comecoDia = h*60 + min;
-
-                    //validador de entrada do fim
-                    while(1) {
-                        printf("\nDigite o horario do fim do dia: ");
-                        scanf("%d:%d", &h, &min);
-                        if(h*60+min>=0 && h*60+min<=24*60)
-                            break;
-                        else
-                            printf("\nHorario invalido! Por favor, insira novamente.\n");
-                    }
-                    fimDia = h*60 + min;
+                else if(opcao=='1') {
+                    comecoDia[0] = validadorDeHorario("Digite o horario do inicio do dia: ");
+                    fimDia[0] = validadorDeHorario("Digite o horario do fim do dia: ");
                 }                
                 
                 //inserir um periodo de tempo ocupado
                 else if(opcao=='2') {
                     while(1) {
-                        //validador do inicio do periodo
-                        while(1) {
-                            printf("\nDigite o horario do inicio do periodo: ");
-                            scanf("%d:%d", &h, &min);
-                            if(h*60+min>=0 && h*60+min<=24*60)
-                                break;
-                            else
-                                printf("\nHorario invalido! Por favor, insira novamente.\n");
-                        }
-                        ocupado1[cont1].comeco = h*60 + min;
-
-                        //validador do fim do periodo
-                        while(1) {
-                            printf("\nDigite o horario do fim do periodo: ");
-                            scanf("%d:%d", &h, &min);
-                            if(h*60+min>=0 && h*60+min<=24*60)
-                                break;
-                            else
-                                printf("\nHorario invalido! Por favor, insira novamente.\n");
-                        }
-                        ocupado1[cont1].fim = h*60 + min; //conversao para minutos
+                        ocupado[0][cont[0]].comeco = validadorDeHorario("Digite o horario do inicio do periodo: ");
+                        ocupado[0][cont[0]].fim = validadorDeHorario("Digite o horario do fim do periodo: ");
 
                         //validador do periodo
-                        if(ocupado1[cont1].comeco >= ocupado1[cont1].fim)
+                        if(ocupado[0][cont[0]].comeco >= ocupado[0][cont[0]].fim)
                             printf("\nPeriodo invalido! Por favor, insira novamente.\n");
                         else {
-                            cont1++;
+                            cont[0]++;
                             break;
                         }
                     }
@@ -173,122 +109,18 @@ int main() {
                 
                 //calcular horarios disponiveis
                 else if(opcao=='3') {
-                    /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
-                       Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
-                       seu tempo de sono pode ser considerado um bloco de tempo ocupado.
-                       Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
-                       blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
 
-                    if(comecoDia>fimDia) {
-                        ocupado1[cont1].comeco = fimDia;
-                        ocupado1[cont1].fim = comecoDia;
-                    }
-                    else if(comecoDia<fimDia) {
-                        ocupado1[cont1].comeco = fimDia;
-                        ocupado1[cont1].fim = 24*60;
-                        cont1++;
-                        ocupado1[cont1].comeco = 0;
-                        ocupado1[cont1].fim = comecoDia;
-                    }
+                    horarioDeSono(comecoDia, fimDia, ocupado, cont, 0);
 
-                    //select sort entre as entradas
-                    for(i=0; i <= cont1-1; i++) {
-                        menor = 100000;
-                        for(j=i; j <= cont1; j++) {
-                            if(ocupado1[j].comeco < menor) {
-                                menor = ocupado1[j].comeco;
-                                posicaoMenor = j;
-                            }
-                        }            
-                        aux = ocupado1[i].comeco;
-                        ocupado1[i].comeco = ocupado1[posicaoMenor].comeco;
-                        ocupado1[posicaoMenor].comeco = aux;
+                    selectSort(ocupado, cont, 0);
 
-                        aux = ocupado1[i].fim;
-                        ocupado1[i].fim = ocupado1[posicaoMenor].fim;
-                        ocupado1[posicaoMenor].fim = aux;
-                    }
-
-                    // select sort se o ocupado1.comeco for igual mas ocupado.fim diferente
-                    for(i=0; i <= cont1; i += numRepetidos+1) {
-                        numRepetidos=0;
-                        for(j = i+1; j <= cont1; j++)
-                            if(ocupado1[j].comeco == ocupado1[i].comeco)
-                                numRepetidos++;
-
-                        for(j=i; j <= i+numRepetidos-1; j++) {
-                            menor = 100000;
-                            for(k=i; k <= i+numRepetidos; k++) {
-                                if(ocupado1[k].fim < menor) {
-                                    menor = ocupado1[k].fim;
-                                    posicaoMenor = k;
-                                }
-                            }            
-                            aux = ocupado1[j].fim;
-                            ocupado1[j].fim = ocupado1[posicaoMenor].fim;
-                            ocupado1[posicaoMenor].fim = aux;
-                        }
-                    }
+                    selectSortMesmoComeco(ocupado, cont, 0);
                     
-                    //remover periodos de tempo redundantes
-                    for(i=1; i <= cont1; i++) {
-                        //se um periodo estiver contido em outro, vamos exclui-lo
-                        if(ocupado1[i].comeco > ocupado1[i-1].comeco && ocupado1[i].fim < ocupado1[i-1].fim) {
-                            for(j=i; j <= cont1-1; j++) {
-                                ocupado1[j].comeco = ocupado1[j+1].comeco;
-                                ocupado1[j].fim = ocupado1[j+1].fim;
-                            }
-                            cont1--; //um periodo a menos no vetor
-                            i--;
-                        }
+                    removerPeriodosRedundantes(ocupado, cont, 0);
 
-                        //se um periodo comecar antes ou quando outro acabar, vamos junta-los
-                        else if(ocupado1[i].comeco <= ocupado1[i-1].fim) {
-                            ocupado1[i-1].fim = ocupado1[i].fim;
-                            for(j=i; j <= cont1-1; j++) {
-                                ocupado1[j].comeco = ocupado1[j+1].comeco;
-                                ocupado1[j].fim = ocupado1[j+1].fim;
-                            }
-                            cont1--; //um periodo a menos no vetor
-                            i--;
-                        }
-                    }
+                    tempoDisponivel(ocupado, disp, cont, 0);
 
-
-                    //calculo dos tempos disponiveis
-                    for(i=0; i <= cont1+1; i++) {
-                        /* No geral, os periodos disponiveis sao o intervalo entre o final de
-                           um periodo ocupado e comeco do seguinte.
-                           Para que o algoritmo seja generico, o primeiro periodo sera sempre
-                           o intervalo entre 00:00 e o comeco do proximo periodo (se o intervalo
-                           tiver duracao 0, ele sera ignorado)
-                           A mesma logica se aplica ao ultimo periodo disp. */
-
-                        if(i==0) {
-                            disp1[i].comeco = 0;
-                            disp1[i].fim = ocupado1[i].comeco;
-                        }
-                        else if(i == cont1+1) {
-                            disp1[i].comeco = ocupado1[i-1].fim;
-                            disp1[i].fim = 24*60;
-                        }
-                        else {
-                            disp1[i].comeco = ocupado1[i-1].fim;
-                            disp1[i].fim = ocupado1[i].comeco;
-                        }
-                    }
-
-                    printf("\nPeriodos de tempo disponiveis:\n");
-                    for(i=0; i <= cont1+1; i++) {
-                        duracao[i] = disp1[i].fim - disp1[i].comeco;
-
-                        if(duracao[i] != 0) { //para excluir periodos nulos
-                            printf("> %02d:%02.0f - %02d:%02.0f\n", disp1[i].comeco/60, (disp1[i].comeco/60.0 - disp1[i].comeco/60)*60, disp1[i].fim/60, (disp1[i].fim/60.0 - disp1[i].fim/60)*60);
-                            printf("  Duracao: %02d:%02.0f\n\n", duracao[i]/60, (duracao[i]/60.0 - duracao[i]/60)*60);
-                        }
-                        else if(i==1)
-                            printf("Nenhum\n");
-                    }
+                    output(disp, cont, 0);
                     
                     printf("\n");
                     system("pause");
@@ -297,127 +129,35 @@ int main() {
             
                 //criar arquivo com horarios disponiveis
                 else if(opcao=='4') {
-                    /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
-                       Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
-                       seu tempo de sono pode ser considerado um bloco de tempo ocupado.
-                       Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
-                       blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
 
-                    if(comecoDia>fimDia) {
-                        ocupado1[cont1].comeco = fimDia;
-                        ocupado1[cont1].fim = comecoDia;
-                    }
-                    else if(comecoDia<fimDia) {
-                        ocupado1[cont1].comeco = fimDia;
-                        ocupado1[cont1].fim = 24*60;
-                        cont1++;
-                        ocupado1[cont1].comeco = 0;
-                        ocupado1[cont1].fim = comecoDia;
-                    }
+                    horarioDeSono(comecoDia, fimDia, ocupado, cont, 0);
 
-                    //select sort entre as entradas
-                    for(i=0; i <= cont1-1; i++) {
-                        menor = 100000;
-                        for(j=i; j <= cont1; j++) {
-                            if(ocupado1[j].comeco < menor) {
-                                menor = ocupado1[j].comeco;
-                                posicaoMenor = j;
-                            }
-                        }            
-                        aux = ocupado1[i].comeco;
-                        ocupado1[i].comeco = ocupado1[posicaoMenor].comeco;
-                        ocupado1[posicaoMenor].comeco = aux;
+                    selectSort(ocupado, cont, 0);
 
-                        aux = ocupado1[i].fim;
-                        ocupado1[i].fim = ocupado1[posicaoMenor].fim;
-                        ocupado1[posicaoMenor].fim = aux;
-                    }
+                    selectSortMesmoComeco(ocupado, cont, 0);
 
-                    // select sort se o ocupado1.comeco for igual mas ocupado.fim diferente
-                    for(i=0; i <= cont1; i += numRepetidos+1) {
-                        numRepetidos = 0;
-                        for(j = i+1; j <= cont1; j++)
-                            if(ocupado1[j].comeco == ocupado1[i].comeco)
-                                numRepetidos++;
-
-                        for(j=i; j <= i+numRepetidos-1; j++) {
-                            menor = 100000;
-                            for(k=i; k <= i+numRepetidos; k++) {
-                                if(ocupado1[k].comeco < menor) {
-                                    menor = ocupado1[k].comeco;
-                                    posicaoMenor = k;
-                                }
-                            }            
-                            aux = ocupado1[j].comeco;
-                            ocupado1[j].comeco = ocupado1[posicaoMenor].comeco;
-                            ocupado1[posicaoMenor].comeco = aux;
-                        }
-                    }
+                    removerPeriodosRedundantes(ocupado, cont, 0);
                     
-                    //remover periodos de tempo redundantes
-                    for(i=1; i <= cont1; i++) {
-                        //se um periodo estiver contido em outro, vamos exclui-lo
-                        if(ocupado1[i].comeco > ocupado1[i-1].comeco && ocupado1[i].fim < ocupado1[i-1].fim) {
-                            for(j=i; j <= cont1-1; j++) {
-                                ocupado1[j].comeco = ocupado1[j+1].comeco;
-                                ocupado1[j].fim = ocupado1[j+1].fim;
-                            }
-                            cont1--; //um periodo a menos no vetor
-                            i--;
-                        }
-
-                        //se um periodo comecar antes ou quando outro acabar, vamos junta-los
-                        else if(ocupado1[i].comeco <= ocupado1[i-1].fim) {
-                            ocupado1[i-1].fim = ocupado1[i].fim;
-                            for(j=i; j <= cont1-1; j++) {
-                                ocupado1[j].comeco = ocupado1[j+1].comeco;
-                                ocupado1[j].fim = ocupado1[j+1].fim;
-                            }
-                            cont1--; //um periodo a menos no vetor
-                            i--;
-                        }
-                    }
-
-
-                    //calculo dos tempos disponiveis
-                    for(i=0; i <= cont1+1; i++) {
-                        /* No geral, os periodos disponiveis sao o intervalo entre o final de
-                           um periodo ocupado e comeco do seguinte.
-                           Para que o algoritmo seja generico, o primeiro periodo sera sempre
-                           o intervalo entre 00:00 e o comeco do proximo periodo (se o intervalo
-                           tiver duracao 0, ele sera ignorado)
-                           A mesma logica se aplica ao ultimo periodo disponivel. */
-
-                        if(i==0) {
-                            disp1[i].comeco = 0;
-                            disp1[i].fim = ocupado1[i].comeco;
-                        }
-                        else if(i == cont1+1) {
-                            disp1[i].comeco = ocupado1[i-1].fim;
-                            disp1[i].fim = 24*60;
-                        }
-                        else {
-                            disp1[i].comeco = ocupado1[i-1].fim;
-                            disp1[i].fim = ocupado1[i].comeco;
-                        }
-                    }
+                    tempoDisponivel(ocupado, disp, cont, 0);
 
                     fp=fopen("horarios.txt", "w");
 
                     fprintf(fp, "Periodos de tempo disponiveis:\n");
-                    for(i=0; i <= cont1+1; i++) {
-                        duracao[i] = disp1[i].fim - disp1[i].comeco;
+                    for(int i=0; i <= cont[0] + 1; i++) {
+                        duracao[i] = disp[0][i].fim - disp[0][i].comeco;
 
                         if(duracao[i] != 0) { //para excluir periodos nulos
-                            fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp1[i].comeco/60, (disp1[i].comeco/60.0 - disp1[i].comeco/60)*60, disp1[i].fim/60, (disp1[i].fim/60.0 - disp1[i].fim/60)*60);
-                            fprintf(fp, "  Duracao: %02d:%02.0f\n\n", duracao[i]/60, (duracao[i]/60.0 - duracao[i]/60)*60);
+                            fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp[0][i].comeco/60, (disp[0][i].comeco/60.0 - disp[0][i].comeco/60)*60, disp[0][i].fim/60, (disp[0][i].fim/60.0 - disp[0][i].fim/60)*60);
+                            fprintf(fp, "  Duracao: %02d:%02.0f\n", duracao[i]/60, (duracao[i]/60.0 - duracao[i]/60)*60);
                         }
                         else if(i==1)
                             fprintf(fp, "Nenhum\n");
-                        printf("\n");
                     }
+
                     fclose(fp);
+
                     break;
+
                 }
             }
         }
@@ -428,15 +168,7 @@ int main() {
             while(1) {
 
                 system("cls");
-                printf("88888888888 d8b                                 888                                 \n");
-                printf("    888     Y8P                                 888                                 \n");
-                printf("    888                                         888                                 \n");
-                printf("    888     888 88888b.d88b.   .d88b.   .d8888b 888  888  .d88b.   .d88b.  88888b.  \n");
-                printf("    888     888 888 \"888 \"88b d8P  Y8b d88P\"    888 .88P d88\"\"88b d88\"\"88b 888 \"88b \n");
-                printf("    888     888 888  888  888 88888888 888      888888K  888  888 888  888 888  888 \n");
-                printf("    888     888 888  888  888 Y8b.     Y88b.    888 \"88b Y88..88P Y88..88P 888  888 \n");
-                printf("    888     888 888  888  888  \"Y8888   \"Y8888P 888  888  \"Y88P\"   \"Y88P\"  888  888 \n\n\n");
-                printf("\tUma calculadora de tempos disponiveis entre os membros de um grupo!\n\n\n");
+                banner();
                 printf("[0] Sair do menu\n");
                 printf("[1] Definir inicio e fim do dia\n");
                 printf("[2] Definir dia da semana para inserir periodo de tempo\n");
@@ -467,15 +199,7 @@ int main() {
                     printf("[1] Definir para todos os dias\n");
                     printf("[2] Definir para dias especificos\n");
                             
-                    //validacao de entrada da opcao
-                    while(1) {
-                        printf("\nOpcao: ");
-                        scanf(" %c", &opcao);
-                        if(opcao=='0'||opcao=='1'||opcao=='2')
-                            break;                                
-                        else
-                            printf("\nOpcao invalida! Por favor, insira novamente.\n");
-                    }
+                    opcao = validadorMiniMenu();
 
                     if(opcao=='0')
                         continue;
@@ -486,85 +210,30 @@ int main() {
                         printf("\nQuantidade de dias: ");
                         scanf("%d", &qtdDias);
 
-                        //lendo os dias
-                        for(i=0; i<qtdDias; ) {
-                            printf("\nDia %d: ", i+1);
-                            fflush(stdin);
-                            gets(diaString);
-                            if(stricmp(diaString, diaAnterior)==0)
-                                printf("\nDia da semana repetido! Por favor, insira novamente.\n");
-                            else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
-                                dias[i]=dom;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
-                                dias[i]=seg;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
-                                dias[i]=ter;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
-                                dias[i]=qua;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
-                                dias[i]=qui;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
-                                dias[i]=sex;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
-                                dias[i]=sab;
-                                i++;
-                            }
-                            else
-                                printf("\nDia da semana invalido! Por favor, insira novamente.\n");
-
-                            strcpy(diaAnterior, diaString);
-                        }
+                        lerDias(dias, qtdDias);
                     }
 
-                    //validador de entrada do horario de inicio
-                    while(1) {
-                        printf("\nDigite o horario do inicio do dia: ");
-                        scanf("%d:%d", &h, &min);
-                        if(h*60+min>=0 && h*60+min<=24*60)
-                            break;
-                        else
-                            printf("\nHorario invalido! Por favor, insira novamente.\n");
-                    }
+                    hora = validadorDeHorario("Digite o horario do inicio do dia: ");
 
                     //se for para todos os dias
                     if(opcao=='1')
                         for(i=0; i<7; i++)
-                            comecoDiaVet[i] = min + h*60;
+                            comecoDia[i] = hora;
                     //se for para dias especificos
                     else
                         for(i=0; i<qtdDias; i++)
-                            comecoDiaVet[dias[i]] = min + h*60;
+                            comecoDia[dias[i]] = hora;
 
-                    //validacao de entrada do horario de fim
-                    while(1) {
-                        printf("\nDigite o horario do fim do dia: ");
-                        scanf("%d:%d", &h, &min);
-                        if(h*60+min>=0 && h*60+min<=24*60)
-                            break;
-                        else
-                            printf("\nHorario invalido! Por favor, insira novamente.\n");
-                    }
+                    hora = validadorDeHorario("Digite o horario do fim do dia: ");
 
                     //se for para todos os dias
                     if(opcao=='1')
                         for(i=0; i<7; i++)
-                            fimDiaVet[i] = min + h*60;
+                            fimDia[i] = hora;
                     //se for para dias especificos
                     else
                         for(i=0; i<qtdDias; i++)
-                            fimDiaVet[dias[i]] = min + h*60;
+                            fimDia[dias[i]] = hora;
                 }
 
                 //definir dia da semana
@@ -616,34 +285,16 @@ int main() {
                             break;
                         }
 
-                        //validador de entrada do inicio
-                        while(1) {
-                            printf("\nDigite o horario do inicio do periodo: ");
-                            scanf("%d:%d", &h, &min);
-                            if(h*60+min>=0 && h*60+min<=24*60)
-                                break;
-                            else
-                                printf("\nHorario invalido! Por favor, insira novamente.\n");
-                        }
+                        ocupado[diaInserir][cont[diaInserir]].comeco = validadorDeHorario("Digite o horario do inicio do periodo: ");
 
-                        ocupado2[diaInserir][cont2[diaInserir]].comeco = h*60 + min;
-
-                        //validador de entrada do fim
-                        while(1) {
-                            printf("\nDigite o horario do fim do periodo: ");
-                            scanf("%d:%d", &h, &min);
-                            if(h*60+min>=0 && h*60+min<=24*60)
-                                break;
-                            else
-                                printf("\nHorario invalido! Por favor, insira novamente.\n");
-                        }
+                        hora = validadorDeHorario("Digite o horario do fim do periodo: ");
 
                         //validador de periodo
-                        if(ocupado2[diaInserir][cont2[diaInserir]].comeco >= h*60 + min)
+                        if(ocupado[diaInserir][cont[diaInserir]].comeco >= hora)
                             printf("\nPeriodo invalido! Por favor, insira novamente.\n");
                         else {
-                            ocupado2[diaInserir][cont2[diaInserir]].fim = h*60 + min;
-                            cont2[diaInserir]++;
+                            ocupado[diaInserir][cont[diaInserir]].fim = hora;
+                            cont[diaInserir]++;
                             break;
                         }
                     }
@@ -655,15 +306,7 @@ int main() {
                     printf("[1] Dias especificos\n");
                     printf("[2] Semana inteira\n");
 
-                    //validacao de entrada da opcao
-                    while(1) {
-                        printf("\nOpcao: ");
-                        scanf(" %c", &opcao);
-                        if(opcao=='0'||opcao=='1'||opcao=='2')
-                            break;                                
-                        else
-                            printf("\nOpcao invalida! Por favor, insira novamente.\n");
-                    }
+                    opcao = validadorMiniMenu();
 
                     if(opcao=='0')
                         continue;
@@ -674,163 +317,20 @@ int main() {
                         printf("\nQuantidade de dias: ");
                         scanf("%d", &qtdDias);
 
-                        //lendo os dias
-                        for(i=0; i<qtdDias; ) {
-                            printf("\nDia %d: ", i+1);
-                            fflush(stdin);
-                            gets(diaString);
-                            if(stricmp(diaString, diaAnterior)==0)
-                                printf("\nDia da semana repetido! Por favor, insira novamente.\n");
-                            else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
-                                dias[i]=dom;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
-                                dias[i]=seg;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
-                                dias[i]=ter;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
-                                dias[i]=qua;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
-                                dias[i]=qui;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
-                                dias[i]=sex;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
-                                dias[i]=sab;
-                                i++;
-                            }
-                            else
-                                printf("\nDia da semana invalido! Por favor, insira novamente.\n");
-
-                            strcpy(diaAnterior, diaString);
-                        }
+                        lerDias(dias, qtdDias);
 
                         for(i=0; i<qtdDias; i++) {
-                            /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
-                            Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
-                            seu tempo de sono pode ser considerado um bloco de tempo ocupado.
-                            Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
-                            blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
+                            horarioDeSono(comecoDia, fimDia, ocupado, cont, dias[i]);
+
+                            selectSort(ocupado, cont, dias[i]);
+
+                            selectSortMesmoComeco(ocupado, cont, dias[i]);
                             
-                            if(comecoDiaVet[dias[i]] > fimDiaVet[dias[i]]) {
-                                ocupado2[dias[i]][cont2[dias[i]]].comeco = fimDiaVet[dias[i]];
-                                ocupado2[dias[i]][cont2[dias[i]]].fim = comecoDiaVet[dias[i]];
-                            }
-                            else if(comecoDiaVet[dias[i]] < fimDiaVet[dias[i]]) {
-                                ocupado2[dias[i]][cont2[dias[i]]].comeco = fimDiaVet[dias[i]];
-                                ocupado2[dias[i]][cont2[dias[i]]].fim = 24*60;
-                                cont2[dias[i]]++;
-                                ocupado2[dias[i]][cont2[dias[i]]].comeco = 0;
-                                ocupado2[dias[i]][cont2[dias[i]]].fim = comecoDiaVet[dias[i]];
-                            }
+                            removerPeriodosRedundantes(ocupado, cont, dias[i]);
 
-                            //select sort entre as entradas
-                            for(j=0; j <= cont2[dias[i]]-1; j++) {
-                                menor = 100000;
-                                for(k=j; k <= cont2[dias[i]]; k++) {
-                                    if(ocupado2[dias[i]][k].comeco < menor) {
-                                        menor = ocupado2[dias[i]][k].comeco;
-                                        posicaoMenor = k;
-                                    }
-                                }            
-                                aux = ocupado2[dias[i]][j].comeco;
-                                ocupado2[dias[i]][j].comeco = ocupado2[dias[i]][posicaoMenor].comeco;
-                                ocupado2[dias[i]][posicaoMenor].comeco = aux;
+                            tempoDisponivel(ocupado, disp, cont, dias[i]);
 
-                                aux = ocupado2[dias[i]][j].fim;
-                                ocupado2[dias[i]][j].fim = ocupado2[dias[i]][posicaoMenor].fim;
-                                ocupado2[dias[i]][posicaoMenor].fim = aux;
-                            }
-
-                            // select sort se o ocupado2.comeco for igual mas ocupado.fim diferente
-                            for(j=0; j <= cont2[dias[i]]; j += numRepetidos+1) {
-                                numRepetidos = 0;
-                                for(k = j+1; k <= cont2[dias[i]]; k++)
-                                    if(ocupado2[dias[i]][k].comeco == ocupado2[dias[i]][j].comeco)
-                                        numRepetidos++;
-
-                                for(k=j; k <= j+numRepetidos-1; k++) {
-                                    menor = 100000;
-                                    for(l=j; l <= j+numRepetidos; l++) {
-                                        if(ocupado2[dias[i]][l].fim < menor) {
-                                            menor = ocupado2[dias[i]][l].fim;
-                                            posicaoMenor = l;
-                                        }
-                                    }            
-                                    aux = ocupado2[dias[i]][k].fim;
-                                    ocupado2[dias[i]][k].fim = ocupado2[dias[i]][posicaoMenor].fim;
-                                    ocupado2[dias[i]][posicaoMenor].fim = aux;
-                                }
-                            }
-                            
-                            //remover periodos de tempo redundantes
-                            for(j = 1; j <= cont2[dias[i]]; j++) {
-                                //se um periodo estiver contido em outro, vamos exclui-lo
-                                if(ocupado2[dias[i]][j].comeco > ocupado2[dias[i]][j-1].comeco && ocupado2[dias[i]][j].fim < ocupado2[dias[i]][j-1].fim) {
-                                    for(k=j; k <= cont2[dias[i]] - 1; k++) {
-                                        ocupado2[dias[i]][k].comeco = ocupado2[dias[i]][k+1].comeco;
-                                        ocupado2[dias[i]][k].fim = ocupado2[dias[i]][k+1].fim;
-                                    }
-                                    cont2[dias[i]]--; //um periodo a menos no vetor
-                                    j--;
-                                }
-
-                                //se um periodo comecar antes ou quando outro acabar, vamos junta-los
-                                else if(ocupado2[dias[i]][j].comeco <= ocupado2[dias[i]][j-1].fim) {
-                                    ocupado2[dias[i]][j-1].fim = ocupado2[dias[i]][j].fim;
-                                    for(k=j; k <= cont2[dias[i]] - 1; k++) {
-                                        ocupado2[dias[i]][k].comeco = ocupado2[dias[i]][k+1].comeco;
-                                        ocupado2[dias[i]][k].fim = ocupado2[dias[i]][k+1].fim;
-                                    }
-                                    cont2[dias[i]]--; //um periodo a menos no vetor
-                                    j--;
-                                }
-                            }
-
-                            //calculo dos tempos disponiveis
-                            for(j=0; j <= cont2[dias[i]] + 1; j++) {
-                                /* No geral, os periodos disponiveis sao o intervalo entre o final de
-                                um periodo ocupado e comeco do seguinte.
-                                Para que o algoritmo seja generico, o primeiro periodo sera sempre
-                                o intervalo entre 00:00 e o comeco do proximo periodo (se o intervalo
-                                tiver duracao 0, ele sera ignorado)
-                                A mesma logica se aplica ao ultimo periodo disponivel. */
-
-                                if(j==0) {
-                                    disp2[dias[i]][j].comeco = 0;
-                                    disp2[dias[i]][j].fim = ocupado2[dias[i]][j].comeco;
-                                }
-                                else if(j == cont2[dias[i]] + 1) {
-                                    disp2[dias[i]][j].comeco = ocupado2[dias[i]][j-1].fim;
-                                    disp2[dias[i]][j].fim = 24*60;
-                                }
-                                else {
-                                    disp2[dias[i]][j].comeco = ocupado2[dias[i]][j-1].fim;
-                                    disp2[dias[i]][j].fim = ocupado2[dias[i]][j].comeco;
-                                }
-                            }
-
-                            printf("\nPeriodos de tempo disponiveis:\n");
-                            for(j=0; j <= cont2[dias[i]] + 1; j++) {
-                                duracao[j] = disp2[dias[i]][j].fim - disp2[dias[i]][j].comeco;
-
-                                if(duracao[j] != 0) { //para excluir periodos nulos
-                                    printf("> %02d:%02.0f - %02d:%02.0f\n", disp2[dias[i]][j].comeco/60, (disp2[dias[i]][j].comeco/60.0 - disp2[dias[i]][j].comeco/60)*60, disp2[dias[i]][j].fim/60, (disp2[dias[i]][j].fim/60.0 - disp2[dias[i]][j].fim/60)*60);
-                                    printf("  Duracao: %02d:%02.0f\n\n", duracao[j]/60, (duracao[j]/60.0 - duracao[j]/60)*60);
-                                }
-                                else if(j==1)
-                                    printf("Nenhum\n");
-                            }
+                            output(disp, cont, dias[i]);
                         }
                         printf("\n");
                         system("pause");
@@ -839,109 +339,15 @@ int main() {
                     //semana inteira
                     else if(opcao=='2') {
                         for(i=0; i<7; i++) {
-                            /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
-                            Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
-                            seu tempo de sono pode ser considerado um bloco de tempo ocupado.
-                            Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
-                            blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
+                            horarioDeSono(comecoDia, fimDia, ocupado, cont, i);
+
+                            selectSort(ocupado, cont, i);
+
+                            selectSortMesmoComeco(ocupado, cont, i);
                             
-                            if(comecoDiaVet[i]>fimDiaVet[i]) {
-                                ocupado2[i][cont2[i]].comeco = fimDiaVet[i];
-                                ocupado2[i][cont2[i]].fim = comecoDiaVet[i];
-                            }
-                            else if(comecoDiaVet[i]<fimDiaVet[i]) {
-                                ocupado2[i][cont2[i]].comeco = fimDiaVet[i];
-                                ocupado2[i][cont2[i]].fim = 24*60;
-                                cont2[i]++;
-                                ocupado2[i][cont2[i]].comeco = 0;
-                                ocupado2[i][cont2[i]].fim = comecoDiaVet[i];
-                            }
+                            removerPeriodosRedundantes(ocupado, cont, i);
 
-                            //select sort entre as entradas
-                            for(j=0; j <= cont2[i]-1; j++) {
-                                menor = 100000;
-                                for(k=j; k <= cont2[i]; k++) {
-                                    if(ocupado2[i][k].comeco < menor) {
-                                        menor = ocupado2[i][k].comeco;
-                                        posicaoMenor = k;
-                                    }
-                                }            
-                                aux = ocupado2[i][j].comeco;
-                                ocupado2[i][j].comeco = ocupado2[i][posicaoMenor].comeco;
-                                ocupado2[i][posicaoMenor].comeco = aux;
-
-                                aux = ocupado2[i][j].fim;
-                                ocupado2[i][j].fim = ocupado2[i][posicaoMenor].fim;
-                                ocupado2[i][posicaoMenor].fim = aux;
-                            }
-
-                            // select sort se o ocupado2.comeco for igual mas ocupado.fim diferente
-                            for(j=0; j <= cont2[i]; j += numRepetidos+1) {
-                                numRepetidos = 0;
-                                for(k = j+1; k <= cont2[i]; k++)
-                                    if(ocupado2[i][k].comeco == ocupado2[i][j].comeco)
-                                        numRepetidos++;
-
-                                for(k=j; k <= j+numRepetidos-1; k++) {
-                                    menor = 100000;
-                                    for(l=j; l <= j+numRepetidos; l++) {
-                                        if(ocupado2[i][l].fim < menor) {
-                                            menor = ocupado2[i][l].fim;
-                                            posicaoMenor = l;
-                                        }
-                                    }            
-                                    aux = ocupado2[i][k].fim;
-                                    ocupado2 [i][k].fim = ocupado2[i][posicaoMenor].fim;
-                                    ocupado2 [i][posicaoMenor].fim = aux;
-                                }
-                            }
-                            
-                            //remover periodos de tempo redundantes
-                            for(j=1; j <= cont2[i]; j++) {
-                                //se um periodo estiver contido em outro, vamos exclui-lo
-                                if(ocupado2[i][j].comeco > ocupado2[i][j-1].comeco && ocupado2[i][j].fim < ocupado2[i][j-1].fim) {
-                                    for(k=j; k <= cont2[i]-1; k++) {
-                                        ocupado2[i][k].comeco = ocupado2[i][k+1].comeco;
-                                        ocupado2[i][k].fim = ocupado2[i][k+1].fim;
-                                    }
-                                    cont2[i]--; //um periodo a menos no vetor
-                                    j--;
-                                }
-
-                                //se um periodo comecar antes ou quando outro acabar, vamos kunta-los
-                                else if(ocupado2[i][j].comeco <= ocupado2[i][j-1].fim) {
-                                    ocupado2[i][j-1].fim = ocupado2[i][j].fim;
-                                    for(k=j; k <= cont2[i]-1; k++) {
-                                        ocupado2[i][k].comeco = ocupado2[i][k+1].comeco;
-                                        ocupado2[i][k].fim = ocupado2[i][k+1].fim;
-                                    }
-                                    cont2[i]--; //um periodo a menos no vetor
-                                    j--;
-                                }
-                            }
-
-                            //calculo dos tempos disponiveis
-                            for(j=0; j <= cont2[i]+1; j++) {
-                                /* No geral, os periodos disponiveis sao o intervalo entre o final de
-                                um periodo ocupado e comeco do seguinte.
-                                Para que o algoritmo seja generico, o primeiro periodo sera sempre
-                                o intervalo entre 00:00 e o comeco do proximo periodo (se o intervalo
-                                tiver duracao 0, ele sera ignorado)
-                                A mesma logica se aplica ao ultimo periodo disponivel. */
-
-                                if(j==0) {
-                                    disp2[i][j].comeco = 0;
-                                    disp2[i][j].fim = ocupado2[i][j].comeco;
-                                }
-                                else if(j == cont2[i]+1) {
-                                    disp2[i][j].comeco = ocupado2[i][j-1].fim;
-                                    disp2[i][j].fim = 24*60;
-                                }
-                                else {
-                                    disp2[i][j].comeco = ocupado2[i][j-1].fim;
-                                    disp2[i][j].fim = ocupado2[i][j].comeco;
-                                }
-                            }
+                            tempoDisponivel(ocupado, disp, cont, i);
 
                             switch(i) {
                                 case dom:
@@ -966,17 +372,7 @@ int main() {
                                     printf("\nSABADO\n");
                             }
 
-                            printf("Periodos de tempo disponiveis:\n");
-                            for(j=0; j <= cont2[i] + 1; j++) {
-                                duracao[j] = disp2[i][j].fim - disp2[i][j].comeco;
-
-                                if(duracao[j] != 0) { //para excluir periodos nulos
-                                    printf("> %02d:%02.0f - %02d:%02.0f\n", disp2[i][j].comeco/60, (disp2[i][j].comeco/60.0 - disp2[i][j].comeco/60)*60, disp2[i][j].fim/60, (disp2[i][j].fim/60.0 - disp2[i][j].fim/60)*60);
-                                    printf("  Duracao: %02d:%02.0f\n\n", duracao[j]/60, (duracao[j]/60.0 - duracao[j]/60)*60);
-                                }
-                                else if(j==1)
-                                    printf("Nenhum\n");
-                            }
+                            output(disp, cont, i);
                         }
                         printf("\n");
                         system("pause");
@@ -990,15 +386,7 @@ int main() {
                     printf("[1] Dias especificos\n");
                     printf("[2] Semana inteira\n");
 
-                    //validacao de entrada da opcao
-                    while(1) {
-                        printf("\nOpcao: ");
-                        scanf(" %c", &opcao);
-                        if(opcao=='0'||opcao=='1'||opcao=='2')
-                            break;                                
-                        else
-                            printf("\nOpcao invalida! Por favor, insira novamente.\n");
-                    }
+                    opcao = validadorMiniMenu();
 
                     if(opcao=='0')
                         continue;
@@ -1009,151 +397,18 @@ int main() {
                         printf("\nQuantidade de dias: ");
                         scanf("%d", &qtdDias);
 
-                        //lendo os dias
-                        for(i=0; i<qtdDias; ) {
-                            printf("\nDia %d: ", i+1);
-                            fflush(stdin);
-                            gets(diaString);
-                            if(stricmp(diaString, diaAnterior)==0)
-                                printf("\nDia da semana repetido! Por favor, insira novamente.\n");
-                            else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
-                                dias[i]=dom;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
-                                dias[i]=seg;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
-                                dias[i]=ter;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
-                                dias[i]=qua;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
-                                dias[i]=qui;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
-                                dias[i]=sex;
-                                i++;
-                            }
-                            else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
-                                dias[i]=sab;
-                                i++;
-                            }
-                            else
-                                printf("\nDia da semana invalido! Por favor, insira novamente.\n");
-
-                            strcpy(diaAnterior, diaString);
-                        }
+                        lerDias(dias, qtdDias);
 
                         for(i=0; i<qtdDias; i++) {
-                            /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
-                            Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
-                            seu tempo de sono pode ser considerado um bloco de tempo ocupado.
-                            Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
-                            blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
+                            horarioDeSono(comecoDia, fimDia, ocupado, cont, dias[i]);
+
+                            selectSort(ocupado, cont, dias[i]);
+
+                            selectSortMesmoComeco(ocupado, cont, dias[i]);
                             
-                            if(comecoDiaVet[dias[i]] > fimDiaVet[dias[i]]) {
-                                ocupado2[dias[i]][cont2[dias[i]]].comeco = fimDiaVet[dias[i]];
-                                ocupado2[dias[i]][cont2[dias[i]]].fim = comecoDiaVet[dias[i]];
-                            }
-                            else if(comecoDiaVet[dias[i]] < fimDiaVet[dias[i]]) {
-                                ocupado2[dias[i]][cont2[dias[i]]].comeco = fimDiaVet[dias[i]];
-                                ocupado2[dias[i]][cont2[dias[i]]].fim = 24*60;
-                                cont2[dias[i]]++;
-                                ocupado2[dias[i]][cont2[dias[i]]].comeco = 0;
-                                ocupado2[dias[i]][cont2[dias[i]]].fim = comecoDiaVet[dias[i]];
-                            }
+                            removerPeriodosRedundantes(ocupado, cont, dias[i]);
 
-                            //select sort entre as entradas
-                            for(j=0; j <= cont2[dias[i]]-1; j++) {
-                                menor = 100000;
-                                for(k=j; k <= cont2[dias[i]]; k++) {
-                                    if(ocupado2[dias[i]][k].comeco < menor) {
-                                        menor = ocupado2[dias[i]][k].comeco;
-                                        posicaoMenor = k;
-                                    }
-                                }            
-                                aux = ocupado2[dias[i]][j].comeco;
-                                ocupado2[dias[i]][j].comeco = ocupado2[dias[i]][posicaoMenor].comeco;
-                                ocupado2[dias[i]][posicaoMenor].comeco = aux;
-
-                                aux = ocupado2[dias[i]][j].fim;
-                                ocupado2[dias[i]][j].fim = ocupado2[dias[i]][posicaoMenor].fim;
-                                ocupado2[dias[i]][posicaoMenor].fim = aux;
-                            }
-
-                            // select sort se o ocupado2.comeco for igual mas ocupado.fim diferente
-                            for(j=0; j <= cont2[dias[i]]; j += numRepetidos+1) {
-                                numRepetidos = 0;
-                                for(k = j+1; k <= cont2[dias[i]]; k++)
-                                    if(ocupado2[dias[i]][k].comeco == ocupado2[dias[i]][j].comeco)
-                                        numRepetidos++;
-
-                                for(k=j; k <= j+numRepetidos-1; k++) {
-                                    menor = 100000;
-                                    for(l=j; l <= j+numRepetidos; l++) {
-                                        if(ocupado2[dias[i]][l].fim < menor) {
-                                            menor = ocupado2[dias[i]][l].fim;
-                                            posicaoMenor = l;
-                                        }
-                                    }            
-                                    aux = ocupado2[dias[i]][k].fim;
-                                    ocupado2[dias[i]][k].fim = ocupado2[dias[i]][posicaoMenor].fim;
-                                    ocupado2[dias[i]][posicaoMenor].fim = aux;
-                                }
-                            }
-                            
-                            //remover periodos de tempo redundantes
-                            for(j=1; j <= cont2[dias[i]]; j++) {
-                                //se um periodo estiver contido em outro, vamos exclui-lo
-                                if(ocupado2[dias[i]][j].comeco > ocupado2[dias[i]][j-1].comeco && ocupado2[dias[i]][j].fim < ocupado2[dias[i]][j-1].fim) {
-                                    for(k=j; k <= cont2[dias[i]]-1; k++) {
-                                        ocupado2[dias[i]][k].comeco = ocupado2[dias[i]][k+1].comeco;
-                                        ocupado2[dias[i]][k].fim = ocupado2[dias[i]][k+1].fim;
-                                    }
-                                    cont2[dias[i]]--; //um periodo a menos no vetor
-                                    j--;
-                                }
-
-                                //se um periodo comecar antes ou quando outro acabar, vamos kunta-los
-                                else if(ocupado2[dias[i]][j].comeco <= ocupado2[dias[i]][j-1].fim) {
-                                    ocupado2[dias[i]][j-1].fim = ocupado2[dias[i]][j].fim;
-                                    for(k=j; k <= cont2[dias[i]]-1; k++) {
-                                        ocupado2[dias[i]][k].comeco = ocupado2[dias[i]][k+1].comeco;
-                                        ocupado2[dias[i]][k].fim = ocupado2[dias[i]][k+1].fim;
-                                    }
-                                    cont2[dias[i]]--; //um periodo a menos no vetor
-                                    j--;
-                                }
-                            }
-
-                            //calculo dos tempos disponiveis
-                            for(j=0; j <= cont2[dias[i]] + 1; j++) {
-                                /* No geral, os periodos disponiveis sao o intervalo entre o final de
-                                um periodo ocupado e comeco do seguinte.
-                                Para que o algoritmo seja generico, o primeiro periodo sera sempre
-                                o intervalo entre 00:00 e o comeco do proximo periodo (se o intervalo
-                                tiver duracao 0, ele sera ignorado)
-                                A mesma logica se aplica ao ultimo periodo disponivel. */
-
-                                if(j==0) {
-                                    disp2[dias[i]][j].comeco = 0;
-                                    disp2[dias[i]][j].fim = ocupado2[dias[i]][j].comeco;
-                                }
-                                else if(j == cont2[dias[i]] + 1) {
-                                    disp2[dias[i]][j].comeco = ocupado2[dias[i]][j-1].fim;
-                                    disp2[dias[i]][j].fim = 24*60;
-                                }
-                                else {
-                                    disp2[dias[i]][j].comeco = ocupado2[dias[i]][j-1].fim;
-                                    disp2[dias[i]][j].fim = ocupado2[dias[i]][j].comeco;
-                                }
-                            }
+                            tempoDisponivel(ocupado, disp, cont, dias[i]);
 
                             switch(dias[i]) {
                                 case dom:
@@ -1179,127 +434,36 @@ int main() {
                             }
 
                             fprintf(fp, "Periodos de tempo disponiveis:\n");
-                            for(j=0; j <= cont2[dias[i]] + 1; j++) {
-                                duracao[j] = disp2[dias[i]][j].fim - disp2[dias[i]][j].comeco;
+                            for(int i=0; i <= cont[dias[i]] + 1; i++) {
+                                duracao[i] = disp[dias[i]][i].fim - disp[dias[i]][i].comeco;
 
-                                if(duracao[j] != 0) { //para excluir periodos nulos
-                                    fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp2[dias[i]][j].comeco/60, (disp2[dias[i]][j].comeco/60.0 - disp2[dias[i]][j].comeco/60)*60, disp2[dias[i]][j].fim/60, (disp2[dias[i]][j].fim/60.0 - disp2[dias[i]][j].fim/60)*60);
-                                    fprintf(fp, "  Duracao: %02d:%02.0f\n", duracao[j]/60, (duracao[j]/60.0 - duracao[j]/60)*60);
+                                if(duracao[i] != 0) { //para excluir periodos nulos
+                                    fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp[dias[i]][i].comeco/60, (disp[dias[i]][i].comeco/60.0 - disp[dias[i]][i].comeco/60)*60, disp[dias[i]][i].fim/60, (disp[dias[i]][i].fim/60.0 - disp[dias[i]][i].fim/60)*60);
+                                    fprintf(fp, "  Duracao: %02d:%02.0f\n", duracao[i]/60, (duracao[i]/60.0 - duracao[i]/60)*60);
                                 }
-                                else if(j==1)
+                                else if(i==1)
                                     fprintf(fp, "Nenhum\n");
-                            }                            
+                            }
+                            
                             fclose(fp);
                         }
+                        break;
                     }
                 
                     //semana inteira
                     else if(opcao=='2') {
                         fp=fopen("horarios_semana.txt", "w");
                         for(i=0; i<7; i++) {
-                            /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
-                            Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
-                            seu tempo de sono pode ser considerado um bloco de tempo ocupado.
-                            Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
-                            blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
                             
-                            if(comecoDiaVet[i]>fimDiaVet[i]) {
-                                ocupado2[i][cont2[i]].comeco = fimDiaVet[i];
-                                ocupado2[i][cont2[i]].fim = comecoDiaVet[i];
-                            }
-                            else if(comecoDiaVet[i]<fimDiaVet[i]) {
-                                ocupado2[i][cont2[i]].comeco = fimDiaVet[i];
-                                ocupado2[i][cont2[i]].fim = 24*60;
-                                cont2[i]++;
-                                ocupado2[i][cont2[i]].comeco = 0;
-                                ocupado2[i][cont2[i]].fim = comecoDiaVet[i];
-                            }
+                            horarioDeSono(comecoDia, fimDia, ocupado, cont, i);
 
-                            //select sort entre as entradas
-                            for(j=0; j <= cont2[i]-1; j++) {
-                                menor = 100000;
-                                for(k=j; k <= cont2[i]; k++) {
-                                    if(ocupado2[i][k].comeco < menor) {
-                                        menor = ocupado2[i][k].comeco;
-                                        posicaoMenor = k;
-                                    }
-                                }            
-                                aux = ocupado2[i][j].comeco;
-                                ocupado2[i][j].comeco = ocupado2[i][posicaoMenor].comeco;
-                                ocupado2[i][posicaoMenor].comeco = aux;
+                            selectSort(ocupado, cont, i);
 
-                                aux = ocupado2[i][j].fim;
-                                ocupado2[i][j].fim = ocupado2[i][posicaoMenor].fim;
-                                ocupado2[i][posicaoMenor].fim = aux;
-                            }
-
-                            // select sort se o ocupado2.comeco for igual mas ocupado.fim diferente
-                            for(j=0; j <= cont2[i]; j += numRepetidos+1) {
-                                numRepetidos = 0;
-                                for(k=j+1; k<=cont2[i]; k++)
-                                    if(ocupado2[i][k].comeco == ocupado2[i][j].comeco)
-                                        numRepetidos++;
-
-                                for(k=j; k <= j+numRepetidos-1; k++) {
-                                    menor = 100000;
-                                    for(l=j; l <= j+numRepetidos; l++) {
-                                        if(ocupado2[i][l].fim < menor) {
-                                            menor = ocupado2[i][l].fim;
-                                            posicaoMenor = l;
-                                        }
-                                    }            
-                                    aux = ocupado2[i][k].fim;
-                                    ocupado2[i][k].fim = ocupado2[i][posicaoMenor].fim;
-                                    ocupado2[i][posicaoMenor].fim = aux;
-                                }
-                            }
+                            selectSortMesmoComeco(ocupado, cont, i);
                             
-                            //remover periodos de tempo redundantes
-                            for(j=1; j <= cont2[i]; j++) {
-                                //se um periodo estiver contido em outro, vamos exclui-lo
-                                if(ocupado2[i][j].comeco > ocupado2[i][j-1].comeco && ocupado2[i][j].fim < ocupado2[i][j-1].fim) {
-                                    for(k=j; k <= cont2[i]-1; k++) {
-                                        ocupado2[i][k].comeco = ocupado2[i][k+1].comeco;
-                                        ocupado2[i][k].fim = ocupado2[i][k+1].fim;
-                                    }
-                                    cont2[i]--; //um periodo a menos no vetor
-                                    j--;
-                                }
+                            removerPeriodosRedundantes(ocupado, cont, i);
 
-                                //se um periodo comecar antes ou quando outro acabar, vamos kunta-los
-                                else if(ocupado2[i][j].comeco <= ocupado2[i][j-1].fim) {
-                                    ocupado2[i][j-1].fim = ocupado2[i][j].fim;
-                                    for(k=j; k <= cont2[i]-1; k++) {
-                                        ocupado2[i][k].comeco = ocupado2[i][k+1].comeco;
-                                        ocupado2[i][k].fim = ocupado2[i][k+1].fim;
-                                    }
-                                    cont2[i]--; //um periodo a menos no vetor
-                                    j--;
-                                }
-                            }
-
-                            //calculo dos tempos disponiveis
-                            for(j=0; j <= cont2[i]+1; j++) {
-                                /* No geral, os periodos disponiveis sao o intervalo entre o final de
-                                um periodo ocupado e comeco do seguinte.
-                                Para que o algoritmo seja generico, o primeiro periodo sera sempre
-                                o intervalo entre 00:00 e o comeco do proximo periodo (se o intervalo
-                                tiver duracao 0, ele sera ignorado)
-                                A mesma logica se aplica ao ultimo periodo disponivel. */
-
-                                if(j==0) {
-                                    disp2[i][j].comeco = 0;
-                                    disp2[i][j].fim = ocupado2[i][j].comeco;
-                                }
-                                else if(j == cont2[i]+1) {
-                                    disp2[i][j].comeco = ocupado2[i][j-1].fim;
-                                    disp2[i][j].fim = 24*60;
-                                }
-                                else {
-                                    disp2[i][j].comeco = ocupado2[i][j-1].fim;
-                                    disp2[i][j].fim = ocupado2[i][j].comeco;
-                                }
-                            }
+                            tempoDisponivel(ocupado, disp, cont, i);
 
                             switch(i) {
                                 case dom:
@@ -1325,20 +489,22 @@ int main() {
                             }
 
                             fprintf(fp, "Periodos de tempo disponiveis:\n");
-                            for(j=0; j <= cont2[i]+1; j++) {
-                                duracao[j] = disp2[i][j].fim - disp2[i][j].comeco;
+                            for(int j=0; j <= cont[i] + 1; j++) {
+                                duracao[j] = disp[i][j].fim - disp[i][j].comeco;
 
                                 if(duracao[j] != 0) { //para excluir periodos nulos
-                                    fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp2[i][j].comeco/60, (disp2[i][j].comeco/60.0 - disp2[i][j].comeco/60)*60, disp2[i][j].fim/60, ((disp2[i][j].fim/60.0) - (disp2[i][j].fim/60))*60);
+                                    fprintf(fp, "> %02d:%02.0f - %02d:%02.0f\n", disp[i][j].comeco/60, (disp[i][j].comeco/60.0 - disp[i][j].comeco/60)*60, disp[i][j].fim/60, (disp[i][j].fim/60.0 - disp[i][j].fim/60)*60);
                                     fprintf(fp, "  Duracao: %02d:%02.0f\n", duracao[j]/60, (duracao[j]/60.0 - duracao[j]/60)*60);
                                 }
                                 else if(j==1)
                                     fprintf(fp, "Nenhum\n");
                             }
                         }
-                        
+
                         fclose(fp);
+
                         break;
+
                     }
                 }
             }
@@ -1346,4 +512,212 @@ int main() {
     }
 
     return 0;
+}
+
+void banner() {
+    printf("88888888888 d8b                                 888\n");
+    printf("    888     Y8P                                 888\n");
+    printf("    888                                         888\n");
+    printf("    888     888 88888b.d88b.   .d88b.   .d8888b 888  888  .d88b.   .d88b.  88888b.\n");
+    printf("    888     888 888 \"888 \"88b d8P  Y8b d88P\"    888 .88P d88\"\"88b d88\"\"88b 888 \"88b\n");
+    printf("    888     888 888  888  888 88888888 888      888888K  888  888 888  888 888  888\n");
+    printf("    888     888 888  888  888 Y8b.     Y88b.    888 \"88b Y88..88P Y88..88P 888  888\n");
+    printf("    888     888 888  888  888  \"Y8888   \"Y8888P 888  888  \"Y88P\"   \"Y88P\"  888  888\n\n\n");
+    printf("\tUma calculadora de tempos disponiveis entre os membros de um grupo!\n\n\n");
+}
+
+int validadorDeHorario(char comando[]) {
+    int h, min;
+    while(1) {
+        printf("\n%s", comando);
+        scanf("%d:%d", &h, &min);
+        if(h*60+min>=0 && h*60+min<=24*60)
+            break;
+        else
+            printf("\nHorario invalido! Por favor, insira novamente.\n");
+    }                        
+    return h*60 + min;
+}
+
+char validadorMiniMenu() {
+    char opcao;
+    while(1) {
+        printf("\nOpcao: ");
+        scanf(" %c", &opcao);
+        if(opcao=='0'||opcao=='1'||opcao=='2')
+            return opcao;                                
+        else
+            printf("\nOpcao invalida! Por favor, insira novamente.\n");
+    }
+}
+
+void lerDias(diaSemana dias[7], int qtdDias) {
+    char diaString[20], diaAnterior[20];
+    for(int i=0; i<qtdDias; ) {
+        printf("\nDia %d: ", i+1);
+        fflush(stdin);
+        gets(diaString);
+        if(i>0 && stricmp(diaString, diaAnterior)==0)
+            printf("\nDia da semana repetido! Por favor, insira novamente.\n");
+        else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
+            dias[i]=dom;
+            i++;
+        }
+        else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
+            dias[i]=seg;
+            i++;
+        }
+        else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
+            dias[i]=ter;
+            i++;
+        }
+        else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
+            dias[i]=qua;
+            i++;
+        }
+        else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
+            dias[i]=qui;
+            i++;
+        }
+        else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
+            dias[i]=sex;
+            i++;
+        }
+        else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
+            dias[i]=sab;
+            i++;
+        }
+        else
+            printf("\nDia da semana invalido! Por favor, insira novamente.\n");
+
+        strcpy(diaAnterior, diaString);
+    }
+}
+
+void horarioDeSono(int comecoDia[7], int fimDia[7], periodo ocupado[7][MAX], int cont[7], int dia) {
+    /* No programa, o dia eh um periodo linear de 00:00 a 23:59.
+       Se o dia da(s) pessoa(s) acabar depois de 00:00 e comecar depois disso, 
+       seu tempo de sono pode ser considerado um bloco de tempo ocupado.
+       Ja se o dia acabar antes de 23:59 e comecar depois das 00:00, serao dois
+       blocos: de 00:00 até o comeco do dia e do fim do dia ate 23:59. */
+    
+    if(comecoDia[dia] > fimDia[dia]) {
+        ocupado[dia][cont[dia]].comeco = fimDia[dia];
+        ocupado[dia][cont[dia]].fim = comecoDia[dia];
+    }
+    else if(comecoDia[dia] < fimDia[dia]) {
+        ocupado[dia][cont[dia]].comeco = fimDia[dia];
+        ocupado[dia][cont[dia]].fim = 24*60;
+        cont[dia]++;
+        ocupado[dia][cont[dia]].comeco = 0;
+        ocupado[dia][cont[dia]].fim = comecoDia[dia];
+    }
+}
+
+void selectSort(periodo ocupado[7][MAX], int cont[7], int dia) {
+    int menor, aux, posicaoMenor, i, j;
+    for(i=0; i <= cont[dia]-1; i++) {
+        menor = 100000;
+        for(j=i; j <= cont[dia]; j++) {
+            if(ocupado[dia][j].comeco < menor) {
+                menor = ocupado[dia][j].comeco;
+                posicaoMenor = j;
+            }
+        }            
+        aux = ocupado[dia][i].comeco;
+        ocupado[dia][i].comeco = ocupado[dia][posicaoMenor].comeco;
+        ocupado[dia][posicaoMenor].comeco = aux;
+
+        aux = ocupado[dia][i].fim;
+        ocupado[dia][i].fim = ocupado[dia][posicaoMenor].fim;
+        ocupado[dia][posicaoMenor].fim = aux;
+    }
+}
+
+void selectSortMesmoComeco(periodo ocupado[7][MAX], int cont[7], int dia) {
+    int i, j, k, numRepetidos, menor, posicaoMenor, aux;
+    for(i=0; i <= cont[dia]; i += numRepetidos+1) {
+        numRepetidos = 0;
+        for(j = i+1; j <= cont[dia]; j++)
+            if(ocupado[dia][j].comeco == ocupado[dia][i].comeco)
+                numRepetidos++;
+
+        for(j=i; j <= i+numRepetidos-1; j++) {
+            menor = 100000;
+            for(k=i; k <= i+numRepetidos; k++) {
+                if(ocupado[dia][k].fim < menor) {
+                    menor = ocupado[dia][k].fim;
+                    posicaoMenor = k;
+                }
+            }            
+            aux = ocupado[dia][j].fim;
+            ocupado [dia][j].fim = ocupado[dia][posicaoMenor].fim;
+            ocupado [dia][posicaoMenor].fim = aux;
+        }
+    }
+}
+
+void removerPeriodosRedundantes(periodo ocupado[7][MAX], int cont[7], int dia) {
+    int i, j;
+    for(i = 1; i <= cont[dia]; i++) {
+        //se um periodo estiver contido em outro, vamos exclui-lo
+        if(ocupado[dia][i].comeco > ocupado[dia][i-1].comeco && ocupado[dia][i].fim < ocupado[dia][i-1].fim) {
+            for(j=i; j <= cont[dia] - 1; j++) {
+                ocupado[dia][j].comeco = ocupado[dia][j+1].comeco;
+                ocupado[dia][j].fim = ocupado[dia][j+1].fim;
+            }
+            cont[dia]--; //um periodo a menos no vetor
+            i--;
+        }
+
+        //se um periodo comecar antes ou quando outro acabar, vamos iunta-los
+        else if(ocupado[dia][i].comeco <= ocupado[dia][i-1].fim) {
+            ocupado[dia][i-1].fim = ocupado[dia][i].fim;
+            for(j=i; j <= cont[dia] - 1; j++) {
+                ocupado[dia][j].comeco = ocupado[dia][j+1].comeco;
+                ocupado[dia][j].fim = ocupado[dia][j+1].fim;
+            }
+            cont[dia]--; //um periodo a menos no vetor
+            i--;
+        }
+    }
+}
+
+void tempoDisponivel(periodo ocupado[7][MAX], periodo disp[7][MAX], int cont[7], int dia) {
+    for(int i=0; i <= cont[dia] + 1; i++) {
+        /* No geral, os periodos disponiveis sao o intervalo entre o final de
+           um periodo ocupado e comeco do seguinte.
+           Para que o algoritmo seja generico, o primeiro periodo sera sempre
+           o intervalo entre 00:00 e o comeco do proximo periodo (se o intervalo
+           tiver duracao 0, ele sera ignorado)
+           A mesma logica se aplica ao ultimo periodo disponivel. */
+
+        if(i==0) {
+            disp[dia][i].comeco = 0;
+            disp[dia][i].fim = ocupado[dia][i].comeco;
+        }
+        else if(i == cont[dia] + 1) {
+            disp[dia][i].comeco = ocupado[dia][i-1].fim;
+            disp[dia][i].fim = 24*60;
+        }
+        else {
+            disp[dia][i].comeco = ocupado[dia][i-1].fim;
+            disp[dia][i].fim = ocupado[dia][i].comeco;
+        }
+    }
+}
+
+void output(periodo disp[7][MAX], int cont[7], int dia) {
+    int duracao[MAX];
+    printf("\nPeriodos de tempo disponiveis:\n");
+    for(int i=0; i <= cont[dia] + 1; i++) {
+        duracao[i] = disp[dia][i].fim - disp[dia][i].comeco;
+
+        if(duracao[i] != 0) { //para excluir periodos nulos
+            printf("> %02d:%02.0f - %02d:%02.0f\n", disp[dia][i].comeco/60, (disp[dia][i].comeco/60.0 - disp[dia][i].comeco/60)*60, disp[dia][i].fim/60, (disp[dia][i].fim/60.0 - disp[dia][i].fim/60)*60);
+            printf("  Duracao: %02d:%02.0f\n\n", duracao[i]/60, (duracao[i]/60.0 - duracao[i]/60)*60);
+        }
+        else if(i==1)
+            printf("Nenhum\n");
+    }
 }
