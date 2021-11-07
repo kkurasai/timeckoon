@@ -35,6 +35,7 @@ Selecionando o menu de dia único o seguinte menú aparecerá:
 ![imagem](https://github.com/kkurasai/timeckoon/blob/main/imagem02.jpg)
 
 Neste menu você poderá definir o início (hora de acordar) e o fim (hora de dormir) do dia e horários ocupados.
+
 Para imprimir os horários livres na tela, selecione "mostrar horários disponíveis".
 
 ![imagem](https://github.com/kkurasai/timeckoon/blob/main/imagem03.jpg)
@@ -47,6 +48,7 @@ Selecionando o menu da semana o seguinte menú aparecerá:
 ![imagem](https://github.com/kkurasai/timeckoon/blob/main/imagem04.jpg)
 
 Neste menu você poderá definir o inicio e o fim de dias especificos ou da semana inteira, definir o dia da semana cujos horários você irá inserir e inserir um período (é preciso ter um dia definido).
+
 Para imprimir os horários livres na tela, selecione "mostrar horários disponíveis" e escolha entre imprimir os horários de dias específicos ou da semana inteira.
 
 ![imagem](https://github.com/kkurasai/timeckoon/blob/main/imagem05.jpg)
