@@ -242,31 +242,31 @@ int main() {
                         printf("\nDigite o dia da semana: ");
                         fflush(stdin);
                         gets(diaString);
-                        if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
+                        if(strcmp(diaString, "Domingo")==0 || strcmp(diaString, "domingo")==0 || strcmp(diaString, "DOMINGO")==0) {
                             diaInserir=dom;
                             break;
                         }
-                        else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
+                        else if(strcmp(diaString, "Segunda")==0 || strcmp(diaString, "segunda")==0 || strcmp(diaString, "SEGUNDA")==0 || strcmp(diaString, "Segunda-feira")==0 || strcmp(diaString, "segunda-feira")==0 || strcmp(diaString, "SEGUNDA-FEIRA")==0) {
                             diaInserir=seg;
                             break;
                         }
-                        else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
+                        else if(strcmp(diaString, "Terca")==0 || strcmp(diaString, "terca")==0 || strcmp(diaString, "TERCA")==0 || strcmp(diaString, "Terca-feira")==0 || strcmp(diaString, "terca-feira")==0 || strcmp(diaString, "TERCA-FEIRA")==0) {
                             diaInserir=ter;
                             break;
                         }
-                        else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
+                        else if(strcmp(diaString, "Quarta")==0 || strcmp(diaString, "quarta")==0 || strcmp(diaString, "QUARTA")==0 || strcmp(diaString, "Quarta-feira")==0 || strcmp(diaString, "quarta-feira")==0 || strcmp(diaString, "QUARTA-FEIRA")==0) {
                             diaInserir=qua;
                             break;
                         }
-                        else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
+                        else if(strcmp(diaString, "Quinta")==0 || strcmp(diaString, "quinta")==0 || strcmp(diaString, "QUINTA")==0 || strcmp(diaString, "Quinta-feira")==0 || strcmp(diaString, "quinta-feira")==0 || strcmp(diaString, "QUINTA-FEIRA")==0) {
                             diaInserir=qui;
                             break;
                         }
-                        else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
+                        else if(strcmp(diaString, "Sexta")==0 || strcmp(diaString, "sexta")==0 || strcmp(diaString, "SEXTA")==0 || strcmp(diaString, "Sexta-feira")==0 || strcmp(diaString, "sexta-feira")==0 || strcmp(diaString, "SEXTA-FEIRA")==0) {
                             diaInserir=sex;
                             break;
                         }
-                        else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
+                        else if(strcmp(diaString, "Sabado")==0 || strcmp(diaString, "sabado")==0 || strcmp(diaString, "SABADO")==0) {
                             diaInserir=sab;
                             break;
                         }
@@ -557,33 +557,33 @@ void lerDias(diaSemana dias[7], int qtdDias) {
         printf("\nDia %d: ", i+1);
         fflush(stdin);
         gets(diaString);
-        if(i>0 && stricmp(diaString, diaAnterior)==0)
+        if(i>0 && strcmp(diaString, diaAnterior)==0)
             printf("\nDia da semana repetido! Por favor, insira novamente.\n");
-        else if(stricmp(diaString, "Domingo")==0 || stricmp(diaString, "domingo")==0 || stricmp(diaString, "DOMINGO")==0) {
+        else if(strcmp(diaString, "Domingo")==0 || strcmp(diaString, "domingo")==0 || strcmp(diaString, "DOMINGO")==0) {
             dias[i]=dom;
             i++;
         }
-        else if(stricmp(diaString, "Segunda")==0 || stricmp(diaString, "segunda")==0 || stricmp(diaString, "SEGUNDA")==0 || stricmp(diaString, "Segunda-feira")==0 || stricmp(diaString, "segunda-feira")==0 || stricmp(diaString, "SEGUNDA-FEIRA")==0) {
+        else if(strcmp(diaString, "Segunda")==0 || strcmp(diaString, "segunda")==0 || strcmp(diaString, "SEGUNDA")==0 || strcmp(diaString, "Segunda-feira")==0 || strcmp(diaString, "segunda-feira")==0 || strcmp(diaString, "SEGUNDA-FEIRA")==0) {
             dias[i]=seg;
             i++;
         }
-        else if(stricmp(diaString, "Terca")==0 || stricmp(diaString, "terca")==0 || stricmp(diaString, "TERCA")==0 || stricmp(diaString, "Terca-feira")==0 || stricmp(diaString, "terca-feira")==0 || stricmp(diaString, "TERCA-FEIRA")==0) {
+        else if(strcmp(diaString, "Terca")==0 || strcmp(diaString, "terca")==0 || strcmp(diaString, "TERCA")==0 || strcmp(diaString, "Terca-feira")==0 || strcmp(diaString, "terca-feira")==0 || strcmp(diaString, "TERCA-FEIRA")==0) {
             dias[i]=ter;
             i++;
         }
-        else if(stricmp(diaString, "Quarta")==0 || stricmp(diaString, "quarta")==0 || stricmp(diaString, "QUARTA")==0 || stricmp(diaString, "Quarta-feira")==0 || stricmp(diaString, "quarta-feira")==0 || stricmp(diaString, "QUARTA-FEIRA")==0) {
+        else if(strcmp(diaString, "Quarta")==0 || strcmp(diaString, "quarta")==0 || strcmp(diaString, "QUARTA")==0 || strcmp(diaString, "Quarta-feira")==0 || strcmp(diaString, "quarta-feira")==0 || strcmp(diaString, "QUARTA-FEIRA")==0) {
             dias[i]=qua;
             i++;
         }
-        else if(stricmp(diaString, "Quinta")==0 || stricmp(diaString, "quinta")==0 || stricmp(diaString, "QUINTA")==0 || stricmp(diaString, "Quinta-feira")==0 || stricmp(diaString, "quinta-feira")==0 || stricmp(diaString, "QUINTA-FEIRA")==0) {
+        else if(strcmp(diaString, "Quinta")==0 || strcmp(diaString, "quinta")==0 || strcmp(diaString, "QUINTA")==0 || strcmp(diaString, "Quinta-feira")==0 || strcmp(diaString, "quinta-feira")==0 || strcmp(diaString, "QUINTA-FEIRA")==0) {
             dias[i]=qui;
             i++;
         }
-        else if(stricmp(diaString, "Sexta")==0 || stricmp(diaString, "sexta")==0 || stricmp(diaString, "SEXTA")==0 || stricmp(diaString, "Sexta-feira")==0 || stricmp(diaString, "sexta-feira")==0 || stricmp(diaString, "SEXTA-FEIRA")==0) {
+        else if(strcmp(diaString, "Sexta")==0 || strcmp(diaString, "sexta")==0 || strcmp(diaString, "SEXTA")==0 || strcmp(diaString, "Sexta-feira")==0 || strcmp(diaString, "sexta-feira")==0 || strcmp(diaString, "SEXTA-FEIRA")==0) {
             dias[i]=sex;
             i++;
         }
-        else if(stricmp(diaString, "Sabado")==0 || stricmp(diaString, "sabado")==0 || stricmp(diaString, "SABADO")==0) {
+        else if(strcmp(diaString, "Sabado")==0 || strcmp(diaString, "sabado")==0 || strcmp(diaString, "SABADO")==0) {
             dias[i]=sab;
             i++;
         }
