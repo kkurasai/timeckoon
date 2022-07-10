@@ -7,7 +7,7 @@ Projeto que visa facilitar reuniões entre os membros de uma equipe. Após infor
 O programa foi feito usando as bibliotecas stdio.h, stdlib.h e string.h da linguagem C.
 
 ## Passo a passo
-(O projeto foi criado durante o processo aprendizado de programação em C)
+(O projeto foi criado no primeiro semestre da faculdade, durante o processo aprendizado de programação em C)
 1. Criação de um programa simples usando poucos recursos da linguagem, que tem menu simples, trabalha com um dia qualquer, usa como output o terminal e faz uso de comandos do terminal Windows.
 2. Implementação do uso de arranjos multidimensionais e strings e criação do segundo menu, que possibilita trabalhar com uma semana inteira ou parte dela.
 3. Implementação da manipulação de arquivos como forma de armazenamento permanente.
